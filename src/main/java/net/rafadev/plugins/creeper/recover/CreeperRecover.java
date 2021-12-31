@@ -28,6 +28,7 @@ public class CreeperRecover extends JavaPlugin {
     private ExplosionManager explosionManager;
 
     private int recoverSpeed = 3;
+    private boolean recoverEvery = false;
     private List<EntityType> entityTypes = new ArrayList<>(Arrays.stream(new EntityType[] {EntityType.CREEPER}).toList());
 
     @Override
@@ -38,6 +39,11 @@ public class CreeperRecover extends JavaPlugin {
             jsonConfiguration.getJson().addProperty("recoverSpeed", this.recoverSpeed);
         } else {
             this.recoverSpeed = jsonConfiguration.getJson().get("recoverSpeed").getAsInt();
+        }
+        if(!jsonConfiguration.getJson().has("recoverEvery")) {
+            jsonConfiguration.getJson().addProperty("recoverEvery", this.recoverEvery);
+        } else {
+            this.recoverEvery = jsonConfiguration.getJson().get("recoverEvery").getAsBoolean();
         }
         if(!jsonConfiguration.getJson().has("entityTypes")) {
             JsonArray jsonArray = new JsonArray();
@@ -85,6 +91,10 @@ public class CreeperRecover extends JavaPlugin {
 
     public int getRecoverSpeed() {
         return recoverSpeed;
+    }
+
+    public boolean isRecoverEvery() {
+        return recoverEvery;
     }
 
 }
