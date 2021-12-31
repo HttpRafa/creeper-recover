@@ -8,12 +8,15 @@ package net.rafadev.plugins.creeper.recover.classes;
 //
 //------------------------------
 
+import net.rafadev.plugins.creeper.recover.utils.MathUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.Container;
+import org.bukkit.entity.EntityType;
+import org.bukkit.entity.TNTPrimed;
 
 import java.util.*;
-import java.util.Comparator;
 
 public class Explosion {
 
@@ -25,6 +28,9 @@ public class Explosion {
         List<Block> sortedBlocks = blocks.stream().sorted(Comparator.comparingDouble(item -> ((Block)item).getLocation().distance(location)).reversed()).toList();
         for (Block block : sortedBlocks) {
             if (block.getType() == Material.TNT) {
+                TNTPrimed tnt = (TNTPrimed) Objects.requireNonNull(block.getLocation().getWorld()).spawnEntity(MathUtils.toCenterLocation(block.getLocation()), EntityType.PRIMED_TNT);
+                tnt.setFuseTicks(MathUtils.generateRandomInteger(10, 30));
+                tnt.setVelocity(MathUtils.calculateVectorBetween2Locations(MathUtils.toCenterLocation(location.clone()), MathUtils.toCenterLocation(block.getLocation().clone())).normalize().multiply(0.7));
                 continue;
             }
             ExplodedBlockInventory inventory = null;
@@ -42,9 +48,13 @@ public class Explosion {
 
     public void recoverBlock() {
         Iterator<ExplodedBlock> iterator = this.blocks.iterator();
-        ExplodedBlock block = iterator.next();
-        block.recover();
-        iterator.remove();
+        if (iterator.hasNext()) {
+            ExplodedBlock block = iterator.next();
+            block.recover();
+            iterator.remove();
+        } else {
+            this.blocks.clear();
+        }
     }
 
     public boolean isFinished() {
