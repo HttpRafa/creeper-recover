@@ -12,9 +12,12 @@ import net.rafadev.plugins.creeper.recover.utils.MathUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
 import org.bukkit.block.Container;
+import org.bukkit.block.DoubleChest;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TNTPrimed;
+import org.bukkit.inventory.DoubleChestInventory;
 
 import java.util.*;
 
@@ -25,8 +28,12 @@ public class Explosion {
 
     public Explosion(Location location, List<Block> blocks) {
         this.location = location;
-        List<Block> sortedBlocks = blocks.stream().sorted(Comparator.comparingDouble(item -> ((Block)item).getLocation().distance(location)).reversed()).toList();
+        List<Block> sortedBlocks = blocks.stream().sorted(Comparator.comparingDouble(item -> ((Block) item).getLocation().distance(location)).reversed()).toList();
+        List<Block> ignoredBlocks = new ArrayList<>();
         for (Block block : sortedBlocks) {
+            if (ignoredBlocks.stream().anyMatch(item -> item.getLocation().distance(block.getLocation()) < 0.1)) {
+                continue;
+            }
             if (block.getType() == Material.TNT) {
                 TNTPrimed tnt = (TNTPrimed) Objects.requireNonNull(block.getLocation().getWorld()).spawnEntity(MathUtils.toCenterLocation(block.getLocation()), EntityType.PRIMED_TNT);
                 tnt.setFuseTicks(MathUtils.generateRandomInteger(10, 30));
@@ -34,15 +41,36 @@ public class Explosion {
                 continue;
             }
             ExplodedBlockInventory inventory = null;
-            if(block.getState() instanceof Container container) {
+            if (block.getState() instanceof Container container) {
                 inventory = new ExplodedBlockInventory();
                 for (int i = 0; i < container.getInventory().getStorageContents().length; i++) {
-                    if(container.getInventory().getStorageContents()[i] != null) {
+                    if (container.getInventory().getStorageContents()[i] != null) {
                         inventory.set(i, container.getInventory().getStorageContents()[i].clone());
                     }
                 }
             }
-            this.blocks.add(new ExplodedBlock(block.getLocation().clone(), block.getType(), block.getBlockData().clone(), inventory));
+            ExplodedBlock explodedBlock = new ExplodedBlock(block.getLocation().clone(), block.getType(), block.getBlockData().clone(), inventory);
+            if (block.getState() instanceof Chest chest) {
+                if (chest.getInventory() instanceof DoubleChestInventory doubleChestInventory) {
+                    DoubleChest doubleChest = doubleChestInventory.getHolder();
+
+                    assert doubleChest != null;
+                    Chest leftSide = (Chest) doubleChest.getLeftSide();
+                    Chest rightSide = (Chest) doubleChest.getRightSide();
+                    assert leftSide != null;
+                    assert rightSide != null;
+                    if (block.getLocation().distance(leftSide.getBlock().getLocation()) < 0.1) {
+                        ignoredBlocks.add(rightSide.getBlock());
+                        ExplodedBlock extraChest = new ExplodedBlock(rightSide.getBlock().getLocation().clone(), rightSide.getBlock().getType(), rightSide.getBlock().getBlockData().clone(), null);
+                        explodedBlock.connectBlock(extraChest);
+                    } else if (block.getLocation().distance(rightSide.getBlock().getLocation()) < 0.1) {
+                        ignoredBlocks.add(leftSide.getBlock());
+                        ExplodedBlock extraChest = new ExplodedBlock(leftSide.getBlock().getLocation().clone(), leftSide.getBlock().getType(), leftSide.getBlock().getBlockData().clone(), null);
+                        explodedBlock.connectBlock(extraChest);
+                    }
+                }
+            }
+            this.blocks.add(explodedBlock);
         }
     }
 

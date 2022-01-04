@@ -15,6 +15,9 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.BlockData;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class ExplodedBlock {
 
     private Location location;
@@ -22,12 +25,21 @@ public class ExplodedBlock {
     private Material material;
     private BlockData data;
     private ExplodedBlockInventory inventory;
+    private final List<ExplodedBlock> connectedBlocks = new ArrayList<>();
 
     public ExplodedBlock(Location location, Material material, BlockData data, ExplodedBlockInventory inventory) {
         this.location = location;
         this.material = material;
         this.data = data;
         this.inventory = inventory;
+    }
+
+    public void connectBlock(ExplodedBlock block) {
+        this.connectedBlocks.add(block);
+    }
+
+    public List<ExplodedBlock> getConnectedBlocks() {
+        return connectedBlocks;
     }
 
     public Location getLocation() {
@@ -63,12 +75,19 @@ public class ExplodedBlock {
     }
 
     public void recover() {
+        for (ExplodedBlock connectedBlock : this.connectedBlocks) {
+            connectedBlock.recoverBasics();
+        }
+        recoverBasics();
+    }
+
+    public void recoverBasics() {
         Block block = this.location.getBlock();
         block.setType(this.material, false);
         block.setBlockData(this.data, false);
         block.getState().update(true, false);
-        if(inventory != null) {
-            if(block.getState() instanceof Container container) {
+        if (inventory != null) {
+            if (block.getState() instanceof Container container) {
                 for (Integer slot : inventory.getItems().keySet()) {
                     container.getInventory().setItem(slot, inventory.get(slot).clone());
                 }
