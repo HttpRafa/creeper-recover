@@ -1,4 +1,4 @@
-package net.rafadev.plugins.creeper.recover.manager;
+package net.rafael.plugins.creeper.recover.manager;
 
 //------------------------------
 //
@@ -8,8 +8,8 @@ package net.rafadev.plugins.creeper.recover.manager;
 //
 //------------------------------
 
-import net.rafadev.plugins.creeper.recover.CreeperRecover;
-import net.rafadev.plugins.creeper.recover.classes.Explosion;
+import net.rafael.plugins.creeper.recover.CreeperRecover;
+import net.rafael.plugins.creeper.recover.classes.Explosion;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;

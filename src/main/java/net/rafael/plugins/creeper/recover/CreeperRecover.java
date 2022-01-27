@@ -1,4 +1,4 @@
-package net.rafadev.plugins.creeper.recover;
+package net.rafael.plugins.creeper.recover;
 
 //------------------------------
 //
@@ -10,9 +10,9 @@ package net.rafadev.plugins.creeper.recover;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
-import net.rafadev.plugins.creeper.recover.config.JsonConfiguration;
-import net.rafadev.plugins.creeper.recover.listener.ExplosionListener;
-import net.rafadev.plugins.creeper.recover.manager.ExplosionManager;
+import net.rafael.plugins.creeper.recover.config.JsonConfiguration;
+import net.rafael.plugins.creeper.recover.listener.ExplosionListener;
+import net.rafael.plugins.creeper.recover.manager.ExplosionManager;
 import org.bukkit.Bukkit;
 import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.java.JavaPlugin;
