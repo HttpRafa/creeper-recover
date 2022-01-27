@@ -24,8 +24,6 @@ import java.util.List;
 
 public class CreeperRecover extends JavaPlugin {
 
-    // Gitlab Test
-
     private static CreeperRecover creeperRecover;
     private ExplosionManager explosionManager;
 
