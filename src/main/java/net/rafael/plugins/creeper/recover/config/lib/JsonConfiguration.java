@@ -1,4 +1,4 @@
-package net.rafael.plugins.creeper.recover.config;
+package net.rafael.plugins.creeper.recover.config.lib;
 
 //------------------------------
 //

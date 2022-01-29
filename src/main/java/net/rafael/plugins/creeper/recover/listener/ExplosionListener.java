@@ -24,7 +24,7 @@ public class ExplosionListener implements Listener {
     @EventHandler
     public void on(EntityExplodeEvent event) {
 
-        if(CreeperRecover.getCreeperRecover().getEntityTypes().contains(event.getEntity().getType()) || CreeperRecover.getCreeperRecover().isRecoverEvery()) {
+        if(CreeperRecover.getCreeperRecover().getConfigManager().usePlugin(event)) {
             List<Block> blocks = event.blockList();
             CreeperRecover.getCreeperRecover().getExplosionManager().handle(new Explosion(event.getLocation().clone(), blocks));
 

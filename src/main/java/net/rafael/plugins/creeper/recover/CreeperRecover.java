@@ -8,55 +8,23 @@ package net.rafael.plugins.creeper.recover;
 //
 //------------------------------
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import net.rafael.plugins.creeper.recover.config.JsonConfiguration;
+import net.rafael.plugins.creeper.recover.config.ConfigManager;
 import net.rafael.plugins.creeper.recover.listener.ExplosionListener;
 import net.rafael.plugins.creeper.recover.manager.ExplosionManager;
 import org.bukkit.Bukkit;
-import org.bukkit.entity.EntityType;
 import org.bukkit.plugin.java.JavaPlugin;
-
-import java.io.File;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 
 public class CreeperRecover extends JavaPlugin {
 
     private static CreeperRecover creeperRecover;
-    private ExplosionManager explosionManager;
 
-    private int recoverSpeed = 3;
-    private boolean recoverEvery = false;
-    private List<EntityType> entityTypes = new ArrayList<>(Arrays.stream(new EntityType[] {EntityType.CREEPER}).toList());
+    private ExplosionManager explosionManager;
+    private ConfigManager configManager;
 
     @Override
     public void onLoad() {
-
-        JsonConfiguration jsonConfiguration = JsonConfiguration.loadConfig(new File("plugins//CreeperRecover/"), "config.json");
-        if(!jsonConfiguration.getJson().has("recoverSpeed")) {
-            jsonConfiguration.getJson().addProperty("recoverSpeed", this.recoverSpeed);
-        } else {
-            this.recoverSpeed = jsonConfiguration.getJson().get("recoverSpeed").getAsInt();
-        }
-        if(!jsonConfiguration.getJson().has("recoverEvery")) {
-            jsonConfiguration.getJson().addProperty("recoverEvery", this.recoverEvery);
-        } else {
-            this.recoverEvery = jsonConfiguration.getJson().get("recoverEvery").getAsBoolean();
-        }
-        if(!jsonConfiguration.getJson().has("entityTypes")) {
-            JsonArray jsonArray = new JsonArray();
-            jsonArray.add(EntityType.CREEPER.name());
-            jsonConfiguration.getJson().add("entityTypes", jsonArray);
-        } else {
-            this.entityTypes = new ArrayList<>();
-            for (JsonElement types : jsonConfiguration.getJson().get("entityTypes").getAsJsonArray()) {
-                this.entityTypes.add(EntityType.valueOf(types.getAsString()));
-            }
-        }
-        jsonConfiguration.saveConfig();
-
+        this.configManager = new ConfigManager();
+        while(!configManager.load()) {}
     }
 
     @Override
@@ -69,7 +37,7 @@ public class CreeperRecover extends JavaPlugin {
 
         Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, () -> {
             explosionManager.recoverBlock();
-        }, 0, this.recoverSpeed);
+        }, 0, this.configManager.getRecoverSpeed());
     }
 
     @Override
@@ -85,16 +53,8 @@ public class CreeperRecover extends JavaPlugin {
         return explosionManager;
     }
 
-    public List<EntityType> getEntityTypes() {
-        return entityTypes;
-    }
-
-    public int getRecoverSpeed() {
-        return recoverSpeed;
-    }
-
-    public boolean isRecoverEvery() {
-        return recoverEvery;
+    public ConfigManager getConfigManager() {
+        return configManager;
     }
 
 }
