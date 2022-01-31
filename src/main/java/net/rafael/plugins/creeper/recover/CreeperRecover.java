@@ -11,6 +11,7 @@ package net.rafael.plugins.creeper.recover;
 import net.rafael.plugins.creeper.recover.config.ConfigManager;
 import net.rafael.plugins.creeper.recover.listener.ExplosionListener;
 import net.rafael.plugins.creeper.recover.manager.ExplosionManager;
+import net.rafael.plugins.creeper.recover.update.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -18,8 +19,12 @@ public class CreeperRecover extends JavaPlugin {
 
     private static CreeperRecover creeperRecover;
 
+    private final String prefix = "§8➜ §3C§breeperRecover §8● §7";
+
     private ExplosionManager explosionManager;
     private ConfigManager configManager;
+
+    private UpdateChecker updateChecker;
 
     @Override
     public void onLoad() {
@@ -32,6 +37,23 @@ public class CreeperRecover extends JavaPlugin {
         creeperRecover = this;
 
         this.explosionManager = new ExplosionManager();
+        this.updateChecker = new UpdateChecker(98836);
+        if(!this.configManager.isIgnoreUpdates()) {
+            this.updateChecker.isLastestVersion(getDescription().getVersion(), aBoolean -> {
+                if(!aBoolean) {
+                    Bukkit.getConsoleSender().sendMessage(prefix + "§8--------------------------------------");
+                    Bukkit.getConsoleSender().sendMessage(prefix + " ");
+                    Bukkit.getConsoleSender().sendMessage(prefix + "§7The plugin §bCreeperRecover §7has an §aupdate§8.");
+                    Bukkit.getConsoleSender().sendMessage(prefix + "§7Current Version§8: §3" + getDescription().getVersion() + " §7Latest Version§8: §a" + this.updateChecker.getLatestVersion());
+                    Bukkit.getConsoleSender().sendMessage(prefix + " ");
+                    Bukkit.getConsoleSender().sendMessage(prefix + "§cThe older version may contain bugs that could lead to item loss§8.");
+                    Bukkit.getConsoleSender().sendMessage(prefix + " ");
+                    Bukkit.getConsoleSender().sendMessage(prefix + "§8--------------------------------------");
+                } else {
+                    Bukkit.getConsoleSender().sendMessage(prefix + "§7The §bCreeperRecover §7plugin is §aup to date§8.");
+                }
+            });
+        }
 
         Bukkit.getPluginManager().registerEvents(new ExplosionListener(), this);
 
@@ -49,12 +71,20 @@ public class CreeperRecover extends JavaPlugin {
         return creeperRecover;
     }
 
+    public String getPrefix() {
+        return prefix;
+    }
+
     public ExplosionManager getExplosionManager() {
         return explosionManager;
     }
 
     public ConfigManager getConfigManager() {
         return configManager;
+    }
+
+    public UpdateChecker getUpdateChecker() {
+        return updateChecker;
     }
 
 }

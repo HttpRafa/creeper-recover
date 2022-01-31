@@ -24,12 +24,21 @@ import java.util.List;
 public class ConfigManager {
 
     private int recoverSpeed = 3;
+    private boolean ignoreUpdates = false;
 
     private List<JsonObject> targetList;
 
     public boolean load() {
 
         JsonConfiguration jsonConfiguration = JsonConfiguration.loadConfig(new File("plugins//CreeperRecover/"), "config.json");
+        if(!jsonConfiguration.getJson().has("ignoreUpdates")) {
+            jsonConfiguration.getJson().addProperty("ignoreUpdates", this.ignoreUpdates);
+            jsonConfiguration.saveConfig();
+
+            return false;
+        } else {
+            this.ignoreUpdates = jsonConfiguration.getJson().get("ignoreUpdates").getAsBoolean();
+        }
         if(!jsonConfiguration.getJson().has("recoverSpeed")) {
             jsonConfiguration.getJson().addProperty("recoverSpeed", this.recoverSpeed);
             jsonConfiguration.saveConfig();
@@ -84,6 +93,10 @@ public class ConfigManager {
 
     public int getRecoverSpeed() {
         return recoverSpeed;
+    }
+
+    public boolean isIgnoreUpdates() {
+        return ignoreUpdates;
     }
 
     public List<JsonObject> getTargetList() {
