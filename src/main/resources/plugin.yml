@@ -1,5 +1,5 @@
 name: CreeperRecover
-version: 1.0.4
+version: 1.0.5
 main: net.rafael.plugins.creeper.recover.CreeperRecover
 api-version: 1.18
 description: Recovers all destroyed blocks by Creeper or other Entities
