@@ -24,6 +24,8 @@ import java.util.List;
 public class ConfigManager {
 
     private int recoverSpeed = 3;
+
+    private boolean bStats = true;
     private boolean ignoreUpdates = false;
 
     private List<JsonObject> targetList;
@@ -31,6 +33,14 @@ public class ConfigManager {
     public boolean load() {
 
         JsonConfiguration jsonConfiguration = JsonConfiguration.loadConfig(new File("plugins//CreeperRecover/"), "config.json");
+        if(!jsonConfiguration.getJson().has("bStats")) {
+            jsonConfiguration.getJson().addProperty("bStats", this.bStats);
+            jsonConfiguration.saveConfig();
+
+            return false;
+        } else {
+            this.bStats = jsonConfiguration.getJson().get("bStats").getAsBoolean();
+        }
         if(!jsonConfiguration.getJson().has("ignoreUpdates")) {
             jsonConfiguration.getJson().addProperty("ignoreUpdates", this.ignoreUpdates);
             jsonConfiguration.saveConfig();
@@ -97,6 +107,10 @@ public class ConfigManager {
 
     public boolean isIgnoreUpdates() {
         return ignoreUpdates;
+    }
+
+    public boolean isbStats() {
+        return bStats;
     }
 
     public List<JsonObject> getTargetList() {

@@ -11,6 +11,7 @@ package net.rafael.plugins.creeper.recover;
 import net.rafael.plugins.creeper.recover.config.ConfigManager;
 import net.rafael.plugins.creeper.recover.listener.ExplosionListener;
 import net.rafael.plugins.creeper.recover.manager.ExplosionManager;
+import net.rafael.plugins.creeper.recover.stats.Metrics;
 import net.rafael.plugins.creeper.recover.update.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -38,6 +39,10 @@ public class CreeperRecover extends JavaPlugin {
 
         this.explosionManager = new ExplosionManager();
         this.updateChecker = new UpdateChecker(98836);
+        if(this.configManager.isbStats()) {
+            int pluginId = 14155;
+            Metrics metrics = new Metrics(this, pluginId);
+        }
         if(!this.configManager.isIgnoreUpdates()) {
             this.updateChecker.isLastestVersion(getDescription().getVersion(), aBoolean -> {
                 if(!aBoolean) {
