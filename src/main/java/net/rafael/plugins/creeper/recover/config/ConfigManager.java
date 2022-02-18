@@ -11,9 +11,12 @@ package net.rafael.plugins.creeper.recover.config;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.rafael.plugins.creeper.recover.CreeperRecover;
 import net.rafael.plugins.creeper.recover.config.enums.TargetTypes;
 import net.rafael.plugins.creeper.recover.config.lib.JsonConfiguration;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
@@ -23,7 +26,12 @@ import java.util.List;
 
 public class ConfigManager {
 
+    public static final int latestConfigVersion = 1;
+
     private int recoverSpeed = 3;
+    private int currentConfigVersion = -1;
+
+    private Sound blockRecoverSound;
 
     private boolean bStats = true;
     private boolean ignoreUpdates = false;
@@ -32,31 +40,72 @@ public class ConfigManager {
 
     public boolean load() {
 
+        try {
+            this.blockRecoverSound = Sound.valueOf("BLOCK_ROOTED_DIRT_PLACE");
+        } catch (Exception exception) {
+            this.blockRecoverSound = Sound.BLOCK_GRAVEL_PLACE;
+        }
+
         JsonConfiguration jsonConfiguration = JsonConfiguration.loadConfig(new File("plugins//CreeperRecover/"), "config.json");
-        if(!jsonConfiguration.getJson().has("bStats")) {
-            jsonConfiguration.getJson().addProperty("bStats", this.bStats);
+
+        // Config Version
+        if(!jsonConfiguration.getJson().has("configVersion")) {
+            jsonConfiguration.getJson().addProperty("configVersion", latestConfigVersion);
             jsonConfiguration.saveConfig();
 
             return false;
         } else {
-            this.bStats = jsonConfiguration.getJson().get("bStats").getAsBoolean();
+            this.currentConfigVersion = jsonConfiguration.getJson().get("configVersion").getAsInt();
+            if(this.currentConfigVersion < latestConfigVersion) {
+                updateConfig(this.currentConfigVersion, latestConfigVersion);
+                return false;
+            }
         }
-        if(!jsonConfiguration.getJson().has("ignoreUpdates")) {
-            jsonConfiguration.getJson().addProperty("ignoreUpdates", this.ignoreUpdates);
+
+        if(!jsonConfiguration.getJson().has("plugin")) {
+            jsonConfiguration.getJson().add("plugin", new JsonObject());
+        }
+        if(!jsonConfiguration.getJson().has("recover")) {
+            jsonConfiguration.getJson().add("recover", new JsonObject());
+        }
+
+        // Plugin
+        if(!jsonConfiguration.getJson().getAsJsonObject("plugin").has("bStats")) {
+            jsonConfiguration.getJson().getAsJsonObject("plugin").addProperty("bStats", this.bStats);
             jsonConfiguration.saveConfig();
 
             return false;
         } else {
-            this.ignoreUpdates = jsonConfiguration.getJson().get("ignoreUpdates").getAsBoolean();
+            this.bStats = jsonConfiguration.getJson().getAsJsonObject("plugin").get("bStats").getAsBoolean();
         }
-        if(!jsonConfiguration.getJson().has("recoverSpeed")) {
-            jsonConfiguration.getJson().addProperty("recoverSpeed", this.recoverSpeed);
+        if(!jsonConfiguration.getJson().getAsJsonObject("plugin").has("ignoreUpdates")) {
+            jsonConfiguration.getJson().getAsJsonObject("plugin").addProperty("ignoreUpdates", this.ignoreUpdates);
             jsonConfiguration.saveConfig();
 
             return false;
         } else {
-            this.recoverSpeed = jsonConfiguration.getJson().get("recoverSpeed").getAsInt();
+            this.ignoreUpdates = jsonConfiguration.getJson().getAsJsonObject("plugin").get("ignoreUpdates").getAsBoolean();
         }
+
+        // Recover
+        if(!jsonConfiguration.getJson().getAsJsonObject("recover").has("recoverSpeed")) {
+            jsonConfiguration.getJson().getAsJsonObject("recover").addProperty("recoverSpeed", this.recoverSpeed);
+            jsonConfiguration.saveConfig();
+
+            return false;
+        } else {
+            this.recoverSpeed = jsonConfiguration.getJson().getAsJsonObject("recover").get("recoverSpeed").getAsInt();
+        }
+        if(!jsonConfiguration.getJson().getAsJsonObject("recover").has("blockRecoverSound")) {
+            jsonConfiguration.getJson().getAsJsonObject("recover").addProperty("blockRecoverSound", this.blockRecoverSound.name());
+            jsonConfiguration.saveConfig();
+
+            return false;
+        } else {
+            this.blockRecoverSound = Sound.valueOf(jsonConfiguration.getJson().getAsJsonObject("recover").get("blockRecoverSound").getAsString());
+        }
+
+        // Target
         if(!jsonConfiguration.getJson().has("target")) {
             JsonArray jsonArray = new JsonArray();
 
@@ -103,6 +152,10 @@ public class ConfigManager {
 
     public int getRecoverSpeed() {
         return recoverSpeed;
+    }
+
+    public Sound getBlockRecoverSound() {
+        return blockRecoverSound;
     }
 
     public boolean isIgnoreUpdates() {
@@ -167,6 +220,42 @@ public class ConfigManager {
         }
 
         return usePlugin;
+    }
+
+    public void updateConfig(int from, int to) {
+        File configFolder = new File("plugins//CreeperRecover/");
+        String configFileName = "config.json";
+
+        boolean success = false;
+
+        if(from == -1 && to == 1) {
+            JsonConfiguration jsonConfiguration = JsonConfiguration.loadConfig(configFolder, configFileName);
+            new File(configFolder, configFileName).delete();
+            JsonConfiguration newConfiguration = JsonConfiguration.loadConfig(configFolder, configFileName);
+
+            newConfiguration.getJson().addProperty("configVersion", to);
+
+            if(!newConfiguration.getJson().has("plugin")) {
+                newConfiguration.getJson().add("plugin", new JsonObject());
+            }
+            if(!newConfiguration.getJson().has("recover")) {
+                newConfiguration.getJson().add("recover", new JsonObject());
+            }
+
+            newConfiguration.getJson().getAsJsonObject("plugin").add("bStats", jsonConfiguration.getJson().get("bStats"));
+            newConfiguration.getJson().getAsJsonObject("plugin").add("ignoreUpdates", jsonConfiguration.getJson().get("ignoreUpdates"));
+
+            newConfiguration.getJson().getAsJsonObject("recover").add("recoverSpeed", jsonConfiguration.getJson().get("recoverSpeed"));
+
+            newConfiguration.getJson().add("target", jsonConfiguration.getJson().get("target"));
+
+            success = true;
+        }
+
+        if(success) {
+            Bukkit.getConsoleSender().sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§7Config updated from version §b" + from + " §7to §3" + to + "§8.");
+        }
+
     }
 
 }

@@ -29,14 +29,14 @@ public class CreeperRecover extends JavaPlugin {
 
     @Override
     public void onLoad() {
+        creeperRecover = this;
+
         this.configManager = new ConfigManager();
         while(!configManager.load()) {}
     }
 
     @Override
     public void onEnable() {
-        creeperRecover = this;
-
         this.explosionManager = new ExplosionManager();
         this.updateChecker = new UpdateChecker(98836);
         if(this.configManager.isbStats()) {

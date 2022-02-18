@@ -8,6 +8,8 @@ package net.rafael.plugins.creeper.recover.classes;
 //
 //------------------------------
 
+import net.rafael.plugins.creeper.recover.CreeperRecover;
+import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.Sound;
@@ -94,7 +96,7 @@ public class ExplodedBlock {
             }
         }
 
-        block.getWorld().playSound(block.getLocation(), Sound.BLOCK_ROOTED_DIRT_PLACE, 0.5f, 1f);
+        block.getWorld().playSound(block.getLocation(), CreeperRecover.getCreeperRecover().getConfigManager().getBlockRecoverSound(), 0.5f, 1f);
     }
 
 }
