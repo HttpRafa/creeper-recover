@@ -249,6 +249,7 @@ public class ConfigManager {
 
             newConfiguration.getJson().add("target", jsonConfiguration.getJson().get("target"));
 
+            newConfiguration.saveConfig();
             success = true;
         }
 
