@@ -230,26 +230,32 @@ public class ConfigManager {
 
         if(from == -1 && to == 1) {
             JsonConfiguration jsonConfiguration = JsonConfiguration.loadConfig(configFolder, configFileName);
-            new File(configFolder, configFileName).delete();
-            JsonConfiguration newConfiguration = JsonConfiguration.loadConfig(configFolder, configFileName);
 
-            newConfiguration.getJson().addProperty("configVersion", to);
+            JsonElement recoverSpeed = jsonConfiguration.getJson().get("recoverSpeed");
 
-            if(!newConfiguration.getJson().has("plugin")) {
-                newConfiguration.getJson().add("plugin", new JsonObject());
+            JsonElement bStats = jsonConfiguration.getJson().get("bStats");
+            JsonElement ignoreUpdates = jsonConfiguration.getJson().get("ignoreUpdates");
+
+            JsonElement targetList = jsonConfiguration.getJson().get("target");
+
+            jsonConfiguration.clear();
+            jsonConfiguration.getJson().addProperty("configVersion", to);
+
+            if (!jsonConfiguration.getJson().has("plugin")) {
+                jsonConfiguration.getJson().add("plugin", new JsonObject());
             }
-            if(!newConfiguration.getJson().has("recover")) {
-                newConfiguration.getJson().add("recover", new JsonObject());
+            if (!jsonConfiguration.getJson().has("recover")) {
+                jsonConfiguration.getJson().add("recover", new JsonObject());
             }
 
-            newConfiguration.getJson().getAsJsonObject("plugin").add("bStats", jsonConfiguration.getJson().get("bStats"));
-            newConfiguration.getJson().getAsJsonObject("plugin").add("ignoreUpdates", jsonConfiguration.getJson().get("ignoreUpdates"));
+            jsonConfiguration.getJson().getAsJsonObject("plugin").add("bStats", bStats);
+            jsonConfiguration.getJson().getAsJsonObject("plugin").add("ignoreUpdates", ignoreUpdates);
 
-            newConfiguration.getJson().getAsJsonObject("recover").add("recoverSpeed", jsonConfiguration.getJson().get("recoverSpeed"));
+            jsonConfiguration.getJson().getAsJsonObject("recover").add("recoverSpeed", recoverSpeed);
 
-            newConfiguration.getJson().add("target", jsonConfiguration.getJson().get("target"));
+            jsonConfiguration.getJson().add("target", targetList);
 
-            newConfiguration.saveConfig();
+            jsonConfiguration.saveConfig();
             success = true;
         }
 

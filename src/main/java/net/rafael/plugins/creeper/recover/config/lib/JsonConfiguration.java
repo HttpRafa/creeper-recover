@@ -29,6 +29,10 @@ public class JsonConfiguration {
 
     }
 
+    public void clear() {
+        this.jsonObject = new JsonObject();
+    }
+
     public JsonObject getJson() {
         return jsonObject;
     }
