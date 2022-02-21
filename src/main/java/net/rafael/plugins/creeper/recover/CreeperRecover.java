@@ -32,7 +32,11 @@ public class CreeperRecover extends JavaPlugin {
         creeperRecover = this;
 
         this.configManager = new ConfigManager();
-        while(!configManager.load()) {}
+        int amount = 0;
+        while (!configManager.load()) {
+            amount++;
+        }
+        Bukkit.getConsoleSender().sendMessage(prefix + "§7The config loaded in §b" + amount + " §7cycles§8.");
     }
 
     @Override
@@ -62,9 +66,7 @@ public class CreeperRecover extends JavaPlugin {
 
         Bukkit.getPluginManager().registerEvents(new ExplosionListener(), this);
 
-        Bukkit.getScheduler().scheduleAsyncRepeatingTask(this, () -> {
-            explosionManager.recoverBlock();
-        }, 0, this.configManager.getRecoverSpeed());
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> explosionManager.recoverBlock(), 0, this.configManager.getRecoverSpeed());
     }
 
     @Override
