@@ -31,13 +31,46 @@ public class ExplosionManager {
                 if(iterator.hasNext()) {
                     Explosion explosion = iterator.next();
                     explosion.recoverBlock();
-                    if(explosion.isFinished()) {
-                        explosion.cleanUp();
+                    if (explosion.isFinished()) {
+                        explosion.finished();
                         iterator.remove();
                     }
                 }
             });
         }
+    }
+
+    public int recoverBlocks() {
+        int recovered = 0;
+        Iterator<Explosion> iterator = this.explosionList.iterator();
+        while (iterator.hasNext()) {
+            Explosion explosion = iterator.next();
+            explosion.recoverBlocks();
+            recovered++;
+            if (explosion.isFinished()) {
+                explosion.finished();
+                iterator.remove();
+            }
+        }
+        return recovered;
+    }
+
+    public int recoverBlocks(int amount) {
+        int recovered = 0;
+        Iterator<Explosion> iterator = this.explosionList.iterator();
+        while (iterator.hasNext()) {
+            if (recovered >= amount) {
+                break;
+            }
+            Explosion explosion = iterator.next();
+            explosion.recoverBlock();
+            recovered++;
+            if (explosion.isFinished()) {
+                explosion.finished();
+                iterator.remove();
+            }
+        }
+        return recovered;
     }
 
 }

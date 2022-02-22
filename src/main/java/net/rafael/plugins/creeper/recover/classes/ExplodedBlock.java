@@ -12,7 +12,6 @@ import net.rafael.plugins.creeper.recover.CreeperRecover;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.Sound;
 import org.bukkit.block.Block;
 import org.bukkit.block.Container;
 import org.bukkit.block.data.BlockData;
@@ -77,10 +76,19 @@ public class ExplodedBlock {
     }
 
     public void recover() {
-        for (ExplodedBlock connectedBlock : this.connectedBlocks) {
-            connectedBlock.recoverBasics();
+        if (Bukkit.isPrimaryThread()) {
+            for (ExplodedBlock connectedBlock : this.connectedBlocks) {
+                connectedBlock.recoverBasics();
+            }
+            recoverBasics();
+        } else {
+            Bukkit.getScheduler().runTask(CreeperRecover.getCreeperRecover(), () -> {
+                for (ExplodedBlock connectedBlock : this.connectedBlocks) {
+                    connectedBlock.recoverBasics();
+                }
+                recoverBasics();
+            });
         }
-        recoverBasics();
     }
 
     public void recoverBasics() {
@@ -96,6 +104,7 @@ public class ExplodedBlock {
             }
         }
 
+        CreeperRecover.getCreeperRecover().getPluginStats().blocksRecovered();
         block.getWorld().playSound(block.getLocation(), CreeperRecover.getCreeperRecover().getConfigManager().getBlockRecoverSound(), 0.5f, 1f);
     }
 

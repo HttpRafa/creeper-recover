@@ -8,13 +8,17 @@ package net.rafael.plugins.creeper.recover;
 //
 //------------------------------
 
+import net.rafael.plugins.creeper.recover.command.RecoverCommand;
 import net.rafael.plugins.creeper.recover.config.ConfigManager;
 import net.rafael.plugins.creeper.recover.listener.ExplosionListener;
 import net.rafael.plugins.creeper.recover.manager.ExplosionManager;
 import net.rafael.plugins.creeper.recover.stats.Metrics;
+import net.rafael.plugins.creeper.recover.stats.PluginStats;
 import net.rafael.plugins.creeper.recover.update.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
+
+import java.util.Objects;
 
 public class CreeperRecover extends JavaPlugin {
 
@@ -24,19 +28,25 @@ public class CreeperRecover extends JavaPlugin {
 
     private ExplosionManager explosionManager;
     private ConfigManager configManager;
+    private PluginStats pluginStats;
 
     private UpdateChecker updateChecker;
+
+    private boolean paused = false;
 
     @Override
     public void onLoad() {
         creeperRecover = this;
 
         this.configManager = new ConfigManager();
+        this.pluginStats = new PluginStats();
+        this.pluginStats.load();
+
         int amount = 0;
         while (!configManager.load()) {
             amount++;
         }
-        Bukkit.getConsoleSender().sendMessage(prefix + "§7The config loaded in §b" + amount + " §7cycles§8.");
+        Bukkit.getConsoleSender().sendMessage(prefix + "§7The config §aloaded §7in §b" + amount + " §7cycles§8.");
     }
 
     @Override
@@ -46,6 +56,8 @@ public class CreeperRecover extends JavaPlugin {
         if(this.configManager.isbStats()) {
             int pluginId = 14155;
             Metrics metrics = new Metrics(this, pluginId);
+            metrics.addCustomChart(new Metrics.SingleLineChart("blocksRecovered", () -> this.pluginStats.getBlocksRecovered()));
+            metrics.addCustomChart(new Metrics.SingleLineChart("explosionsRecovered", () -> this.pluginStats.getExplosionsRecovered()));
         }
         if(!this.configManager.isIgnoreUpdates()) {
             this.updateChecker.isLastestVersion(getDescription().getVersion(), aBoolean -> {
@@ -64,14 +76,32 @@ public class CreeperRecover extends JavaPlugin {
             });
         }
 
+        // Commands
+        Objects.requireNonNull(getCommand("recover")).setExecutor(new RecoverCommand());
+
+        // Events
         Bukkit.getPluginManager().registerEvents(new ExplosionListener(), this);
 
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> explosionManager.recoverBlock(), 0, this.configManager.getRecoverSpeed());
+        // Tasks
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+            if (!paused) explosionManager.recoverBlock();
+        }, 0, this.configManager.getRecoverSpeed());
     }
 
     @Override
     public void onDisable() {
+        int recovered = this.getExplosionManager().recoverBlocks();
+        Bukkit.getConsoleSender().sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§7The plugin recovered §b" + recovered + " §7blocks before the server §cstops§8.");
 
+        this.pluginStats.save();
+    }
+
+    public void pause() {
+        this.paused = true;
+    }
+
+    public void resume() {
+        this.paused = false;
     }
 
     public static CreeperRecover getCreeperRecover() {
@@ -88,6 +118,10 @@ public class CreeperRecover extends JavaPlugin {
 
     public ConfigManager getConfigManager() {
         return configManager;
+    }
+
+    public PluginStats getPluginStats() {
+        return pluginStats;
     }
 
     public UpdateChecker getUpdateChecker() {

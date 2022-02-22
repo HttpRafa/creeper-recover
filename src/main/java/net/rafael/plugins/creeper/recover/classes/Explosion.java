@@ -8,6 +8,7 @@ package net.rafael.plugins.creeper.recover.classes;
 //
 //------------------------------
 
+import net.rafael.plugins.creeper.recover.CreeperRecover;
 import net.rafael.plugins.creeper.recover.utils.MathUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -85,11 +86,21 @@ public class Explosion {
         }
     }
 
+    public void recoverBlocks() {
+        Iterator<ExplodedBlock> iterator = this.blocks.iterator();
+        while (iterator.hasNext()) {
+            ExplodedBlock block = iterator.next();
+            block.recover();
+            iterator.remove();
+        }
+    }
+
     public boolean isFinished() {
         return this.blocks.size() == 0;
     }
 
-    public void cleanUp() {
+    public void finished() {
+        CreeperRecover.getCreeperRecover().getPluginStats().explosionsRecovered();
     }
 
     public List<ExplodedBlock> getBlocks() {
