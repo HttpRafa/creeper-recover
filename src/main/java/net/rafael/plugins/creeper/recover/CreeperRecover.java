@@ -9,6 +9,7 @@ package net.rafael.plugins.creeper.recover;
 //------------------------------
 
 import net.rafael.plugins.creeper.recover.command.RecoverCommand;
+import net.rafael.plugins.creeper.recover.command.tab.RecoverCommandTabCompleter;
 import net.rafael.plugins.creeper.recover.config.ConfigManager;
 import net.rafael.plugins.creeper.recover.listener.ExplosionListener;
 import net.rafael.plugins.creeper.recover.manager.ExplosionManager;
@@ -78,6 +79,7 @@ public class CreeperRecover extends JavaPlugin {
 
         // Commands
         Objects.requireNonNull(getCommand("recover")).setExecutor(new RecoverCommand());
+        Objects.requireNonNull(getCommand("recover")).setTabCompleter(new RecoverCommandTabCompleter());
 
         // Events
         Bukkit.getPluginManager().registerEvents(new ExplosionListener(), this);
