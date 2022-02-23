@@ -13,6 +13,7 @@ import net.rafael.plugins.creeper.recover.classes.Explosion;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
+import java.util.ConcurrentModificationException;
 import java.util.Iterator;
 import java.util.List;
 
@@ -33,7 +34,11 @@ public class ExplosionManager {
                     explosion.recoverBlock();
                     if (explosion.isFinished()) {
                         explosion.finished();
-                        iterator.remove();
+                        try {
+                            iterator.remove();
+                        } catch (ConcurrentModificationException ignored) {
+
+                        }
                     }
                 }
             });

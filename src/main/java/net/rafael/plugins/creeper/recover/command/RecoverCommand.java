@@ -37,7 +37,9 @@ public class RecoverCommand implements CommandExecutor {
                         int recovered = CreeperRecover.getCreeperRecover().getExplosionManager().recoverBlocks(amount);
                         sender.sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§b" + recovered + " §7blocks recovered§8.");
                     }
-                    CreeperRecover.getCreeperRecover().resume();
+                    Bukkit.getScheduler().runTaskLater(CreeperRecover.getCreeperRecover(), () -> {
+                        CreeperRecover.getCreeperRecover().resume();
+                    }, 5);
                 });
             } catch (NumberFormatException exception) {
                 sender.sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§c" + exception.getMessage());
