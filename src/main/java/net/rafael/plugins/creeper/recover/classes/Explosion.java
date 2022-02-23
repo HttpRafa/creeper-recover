@@ -80,7 +80,11 @@ public class Explosion {
         if (iterator.hasNext()) {
             ExplodedBlock block = iterator.next();
             block.recover();
-            iterator.remove();
+            try {
+                iterator.remove();
+            } catch (ConcurrentModificationException ignored) {
+
+            }
         } else {
             this.blocks.clear();
         }
