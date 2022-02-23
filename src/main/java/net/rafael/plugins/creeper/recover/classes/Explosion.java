@@ -86,13 +86,31 @@ public class Explosion {
         }
     }
 
-    public void recoverBlocks() {
+    public int recoverBlocks() {
+        int recovered = 0;
         Iterator<ExplodedBlock> iterator = this.blocks.iterator();
         while (iterator.hasNext()) {
             ExplodedBlock block = iterator.next();
             block.recover();
+            recovered++;
             iterator.remove();
         }
+        return recovered;
+    }
+
+    public int recoverBlocks(int amount) {
+        int recovered = 0;
+        Iterator<ExplodedBlock> iterator = this.blocks.iterator();
+        while (iterator.hasNext()) {
+            if (recovered >= amount) {
+                break;
+            }
+            ExplodedBlock block = iterator.next();
+            block.recover();
+            recovered++;
+            iterator.remove();
+        }
+        return recovered;
     }
 
     public boolean isFinished() {

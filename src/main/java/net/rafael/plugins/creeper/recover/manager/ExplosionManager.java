@@ -45,8 +45,7 @@ public class ExplosionManager {
         Iterator<Explosion> iterator = this.explosionList.iterator();
         while (iterator.hasNext()) {
             Explosion explosion = iterator.next();
-            explosion.recoverBlocks();
-            recovered++;
+            recovered += explosion.recoverBlocks();
             if (explosion.isFinished()) {
                 explosion.finished();
                 iterator.remove();
@@ -63,8 +62,7 @@ public class ExplosionManager {
                 break;
             }
             Explosion explosion = iterator.next();
-            explosion.recoverBlock();
-            recovered++;
+            recovered += explosion.recoverBlocks((amount - recovered));
             if (explosion.isFinished()) {
                 explosion.finished();
                 iterator.remove();

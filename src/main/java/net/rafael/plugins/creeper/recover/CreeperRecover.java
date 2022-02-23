@@ -86,6 +86,9 @@ public class CreeperRecover extends JavaPlugin {
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
             if (!paused) explosionManager.recoverBlock();
         }, 0, this.configManager.getRecoverSpeed());
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
+            this.pluginStats.tick();
+        }, 0, 20 * 60 * 5);
     }
 
     @Override

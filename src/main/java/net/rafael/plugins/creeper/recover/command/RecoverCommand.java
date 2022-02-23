@@ -8,17 +8,24 @@ package net.rafael.plugins.creeper.recover.command;
 //
 //------------------------------
 
+import com.google.gson.*;
 import net.rafael.plugins.creeper.recover.CreeperRecover;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
 
+import java.util.Map;
+
 public class RecoverCommand implements CommandExecutor {
 
     @Override
     public boolean onCommand(CommandSender sender, Command command, String label, String[] args) {
-        if (args.length == 2 && args[0].equalsIgnoreCase("recover")) {
+        if (!sender.hasPermission("creeper.recover.command")) {
+            sender.sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§cYou don't have permission to use this command§8.");
+            return false;
+        }
+        if (args.length == 2 && args[0].equalsIgnoreCase("fix")) {
             try {
                 Bukkit.getScheduler().runTaskAsynchronously(CreeperRecover.getCreeperRecover(), () -> {
                     CreeperRecover.getCreeperRecover().pause();
@@ -35,6 +42,12 @@ public class RecoverCommand implements CommandExecutor {
             } catch (NumberFormatException exception) {
                 sender.sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§c" + exception.getMessage());
             }
+        } else if (args.length == 1 && args[0].equalsIgnoreCase("stats")) {
+            Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
+            JsonObject jsonObject = new JsonParser().parse(gson.toJson(CreeperRecover.getCreeperRecover().getPluginStats())).getAsJsonObject();
+            for (Map.Entry<String, JsonElement> elementEntry : jsonObject.entrySet()) {
+                sender.sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§3" + elementEntry.getKey() + " §8» §b" + gson.toJson(elementEntry.getValue()));
+            }
         } else {
             showHelp(sender);
         }
@@ -42,7 +55,8 @@ public class RecoverCommand implements CommandExecutor {
     }
 
     public void showHelp(CommandSender sender) {
-        sender.sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§8/§7recover §brecover §8[§3amount of blocks§8]");
+        sender.sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§8/§7recover §bfix §8[§3amount of blocks§8/§3all§8]");
+        sender.sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§8/§7recover §bstats");
     }
 
 }
