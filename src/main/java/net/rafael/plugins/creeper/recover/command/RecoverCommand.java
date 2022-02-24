@@ -8,14 +8,11 @@ package net.rafael.plugins.creeper.recover.command;
 //
 //------------------------------
 
-import com.google.gson.*;
 import net.rafael.plugins.creeper.recover.CreeperRecover;
 import org.bukkit.Bukkit;
 import org.bukkit.command.Command;
 import org.bukkit.command.CommandExecutor;
 import org.bukkit.command.CommandSender;
-
-import java.util.Map;
 
 public class RecoverCommand implements CommandExecutor {
 
@@ -45,11 +42,9 @@ public class RecoverCommand implements CommandExecutor {
                 sender.sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§c" + exception.getMessage());
             }
         } else if (args.length == 1 && args[0].equalsIgnoreCase("stats")) {
-            Gson gson = new GsonBuilder().disableHtmlEscaping().setPrettyPrinting().create();
-            JsonObject jsonObject = new JsonParser().parse(gson.toJson(CreeperRecover.getCreeperRecover().getPluginStats())).getAsJsonObject();
-            for (Map.Entry<String, JsonElement> elementEntry : jsonObject.entrySet()) {
-                sender.sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§3" + elementEntry.getKey() + " §8» §b" + gson.toJson(elementEntry.getValue()));
-            }
+            sender.sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§7Daily§8:");
+            sender.sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "   §b" + "BlocksRecovered" + " §8» §7" + CreeperRecover.getCreeperRecover().getPluginStats().getBlocksRecovered());
+            sender.sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "   §b" + "ExplosionsRecovered" + " §8» §7" + CreeperRecover.getCreeperRecover().getPluginStats().getExplosionsRecovered());
         } else {
             showHelp(sender);
         }
