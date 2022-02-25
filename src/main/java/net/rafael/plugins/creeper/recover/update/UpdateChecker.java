@@ -49,9 +49,13 @@ public class UpdateChecker {
             if (this.latestVersion.compare(currentVersion) == 0) {
                 this.uptoDate = true;
                 consumer.accept(true);
-            } else {
+            } else if (this.latestVersion.compare(currentVersion) < 0) {
                 this.uptoDate = false;
                 consumer.accept(false);
+            } else if (this.latestVersion.compare(currentVersion) < 1) {
+                Bukkit.getConsoleSender().sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§7You are currently using a §bdeveloper §7version§8.");
+                this.uptoDate = true;
+                consumer.accept(true);
             }
         });
     }

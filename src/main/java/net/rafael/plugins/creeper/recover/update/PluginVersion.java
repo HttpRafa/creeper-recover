@@ -33,7 +33,7 @@ public class PluginVersion {
     }
 
     public int compare(PluginVersion pluginVersion) {
-        return Double.compare(pluginVersion.asInt(), this.asInt());
+        return Integer.compare(pluginVersion.asInt(), this.asInt());
     }
 
     public int asInt() {
