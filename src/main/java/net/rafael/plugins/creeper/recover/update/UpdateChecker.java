@@ -13,7 +13,6 @@ import org.bukkit.Bukkit;
 
 import java.io.IOException;
 import java.io.InputStream;
-
 import java.net.URL;
 import java.util.Scanner;
 import java.util.function.Consumer;
@@ -22,7 +21,7 @@ public class UpdateChecker {
 
     private final int resourceId;
     private boolean uptoDate = false;
-    private String latestVersion = null;
+    private PluginVersion latestVersion = null;
 
     public UpdateChecker(int resourceId) {
         this.resourceId = resourceId;
@@ -44,10 +43,10 @@ public class UpdateChecker {
         });
     }
 
-    public void isLastestVersion(String currentVersion, Consumer<Boolean> consumer) {
-        getLastestVersion(latest ->  {
-            this.latestVersion = latest;
-            if(latest.equalsIgnoreCase(currentVersion)) {
+    public void isLastestVersion(PluginVersion currentVersion, Consumer<Boolean> consumer) {
+        getLastestVersion(latest -> {
+            this.latestVersion = new PluginVersion().from(latest);
+            if (this.latestVersion.compare(currentVersion) == 0) {
                 this.uptoDate = true;
                 consumer.accept(true);
             } else {
@@ -65,7 +64,7 @@ public class UpdateChecker {
         return uptoDate;
     }
 
-    public String getLatestVersion() {
+    public PluginVersion getLatestVersion() {
         return latestVersion;
     }
 
