@@ -15,6 +15,7 @@ import net.rafael.plugins.creeper.recover.listener.ExplosionListener;
 import net.rafael.plugins.creeper.recover.manager.ExplosionManager;
 import net.rafael.plugins.creeper.recover.stats.Metrics;
 import net.rafael.plugins.creeper.recover.stats.PluginStats;
+import net.rafael.plugins.creeper.recover.update.PluginVersion;
 import net.rafael.plugins.creeper.recover.update.UpdateChecker;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
@@ -24,6 +25,7 @@ import java.util.Objects;
 public class CreeperRecover extends JavaPlugin {
 
     private static CreeperRecover creeperRecover;
+    private static PluginVersion version;
 
     private final String prefix = "§8➜ §3C§breeperRecover §8● §7";
 
@@ -35,9 +37,16 @@ public class CreeperRecover extends JavaPlugin {
 
     private boolean paused = false;
 
+    public static PluginVersion getVersion() {
+        return version;
+    }
+
     @Override
     public void onLoad() {
         creeperRecover = this;
+        version = new PluginVersion().from(getDescription().getVersion());
+
+        Bukkit.getConsoleSender().sendMessage(prefix + "§7Loading §b" + getDescription().getName() + " §7version §3" + version.toString());
 
         this.configManager = new ConfigManager();
         this.pluginStats = new PluginStats();
@@ -51,18 +60,38 @@ public class CreeperRecover extends JavaPlugin {
     }
 
     @Override
+    public void onDisable() {
+        int recovered = this.getExplosionManager().recoverBlocks();
+        Bukkit.getConsoleSender().sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§7The plugin recovered §b" + recovered + " §7blocks before the server §cstops§8.");
+
+        this.pluginStats.save();
+    }
+
+    public void pause() {
+        this.paused = true;
+    }
+
+    public void resume() {
+        this.paused = false;
+    }
+
+    public static CreeperRecover getCreeperRecover() {
+        return creeperRecover;
+    }
+
+    @Override
     public void onEnable() {
         this.explosionManager = new ExplosionManager();
         this.updateChecker = new UpdateChecker(98836);
-        if(this.configManager.isbStats()) {
+        if (this.configManager.isbStats()) {
             int pluginId = 14155;
             Metrics metrics = new Metrics(this, pluginId);
             metrics.addCustomChart(new Metrics.SingleLineChart("blocksRecovered", () -> this.pluginStats.getBlocksRecovered()));
             metrics.addCustomChart(new Metrics.SingleLineChart("explosionsRecovered", () -> this.pluginStats.getExplosionsRecovered()));
         }
         if(!this.configManager.isIgnoreUpdates()) {
-            this.updateChecker.isLastestVersion(getDescription().getVersion(), aBoolean -> {
-                if(!aBoolean) {
+            this.updateChecker.isLastestVersion(version, aBoolean -> {
+                if (!aBoolean) {
                     Bukkit.getConsoleSender().sendMessage(prefix + "§8--------------------------------------");
                     Bukkit.getConsoleSender().sendMessage(prefix + " ");
                     Bukkit.getConsoleSender().sendMessage(prefix + "§7The plugin §bCreeperRecover §7has an §aupdate§8.");
@@ -91,26 +120,6 @@ public class CreeperRecover extends JavaPlugin {
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
             this.pluginStats.tick();
         }, 0, 20 * 60 * 5);
-    }
-
-    @Override
-    public void onDisable() {
-        int recovered = this.getExplosionManager().recoverBlocks();
-        Bukkit.getConsoleSender().sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§7The plugin recovered §b" + recovered + " §7blocks before the server §cstops§8.");
-
-        this.pluginStats.save();
-    }
-
-    public void pause() {
-        this.paused = true;
-    }
-
-    public void resume() {
-        this.paused = false;
-    }
-
-    public static CreeperRecover getCreeperRecover() {
-        return creeperRecover;
     }
 
     public String getPrefix() {
