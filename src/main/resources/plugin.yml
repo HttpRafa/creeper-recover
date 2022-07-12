@@ -1,9 +1,9 @@
 name: CreeperRecover
-version: 1.0.7
-main: net.rafael.plugins.creeper.recover.CreeperRecover
+version: 1.0.8
+main: de.rafael.plugins.creeper.recover.CreeperRecover
 api-version: 1.16
 description: Recovers all destroyed blocks by Creeper or other Entities
-author: RafaDev
+author: HttpRafa
 commands:
   recover:
     description: Command to control the plugin
