@@ -9,11 +9,11 @@ package net.rafael.plugins.creeper.recover.classes;
 //------------------------------
 
 import net.rafael.plugins.creeper.recover.CreeperRecover;
+import net.rafael.plugins.creeper.recover.classes.data.IBlockData;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.Container;
 import org.bukkit.block.data.BlockData;
 
 import java.util.ArrayList;
@@ -23,24 +23,34 @@ public class ExplodedBlock {
 
     private Location location;
 
+    // Material, BlockData and other data
     private Material material;
     private BlockData data;
-    private ExplodedBlockInventory inventory;
+    private final List<IBlockData> otherData = new ArrayList<>();
+
+    // Inventory and connectedBlocks
     private final List<ExplodedBlock> connectedBlocks = new ArrayList<>();
 
-    public ExplodedBlock(Location location, Material material, BlockData data, ExplodedBlockInventory inventory) {
+    public ExplodedBlock(Location location, Material material, BlockData data) {
         this.location = location;
         this.material = material;
         this.data = data;
-        this.inventory = inventory;
     }
 
     public void connectBlock(ExplodedBlock block) {
         this.connectedBlocks.add(block);
     }
 
+    public void addData(IBlockData data) {
+        this.otherData.add(data);
+    }
+
     public List<ExplodedBlock> getConnectedBlocks() {
         return connectedBlocks;
+    }
+
+    public List<IBlockData> getOtherData() {
+        return otherData;
     }
 
     public Location getLocation() {
@@ -67,14 +77,6 @@ public class ExplodedBlock {
         this.data = data;
     }
 
-    public ExplodedBlockInventory getInventory() {
-        return inventory;
-    }
-
-    public void setInventory(ExplodedBlockInventory inventory) {
-        this.inventory = inventory;
-    }
-
     public void recover() {
         if (Bukkit.isPrimaryThread()) {
             for (ExplodedBlock connectedBlock : this.connectedBlocks) {
@@ -95,13 +97,15 @@ public class ExplodedBlock {
         Block block = this.location.getBlock();
         block.setType(this.material, false);
         block.setBlockData(this.data, false);
+
+        for (IBlockData blockData : this.otherData) {
+            blockData.apply(block, IBlockData.RecoverPhase.PRE_STATE_UPDATE);
+        }
+
         block.getState().update(true, false);
-        if (inventory != null) {
-            if (block.getState() instanceof Container container) {
-                for (Integer slot : inventory.getItems().keySet()) {
-                    container.getInventory().setItem(slot, inventory.get(slot).clone());
-                }
-            }
+
+        for (IBlockData blockData : this.otherData) {
+            blockData.apply(block, IBlockData.RecoverPhase.POST_STATE_UPDATE);
         }
 
         CreeperRecover.getCreeperRecover().getPluginStats().blocksRecovered();

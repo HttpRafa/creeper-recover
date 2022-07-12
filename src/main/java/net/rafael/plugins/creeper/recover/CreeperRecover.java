@@ -11,7 +11,7 @@ package net.rafael.plugins.creeper.recover;
 import net.rafael.plugins.creeper.recover.command.RecoverCommand;
 import net.rafael.plugins.creeper.recover.command.tab.RecoverCommandTabCompleter;
 import net.rafael.plugins.creeper.recover.config.ConfigManager;
-import net.rafael.plugins.creeper.recover.listener.ExplosionListener;
+import net.rafael.plugins.creeper.recover.listener.EntityExplodeListener;
 import net.rafael.plugins.creeper.recover.manager.ExplosionManager;
 import net.rafael.plugins.creeper.recover.stats.Metrics;
 import net.rafael.plugins.creeper.recover.stats.PluginStats;
@@ -111,7 +111,7 @@ public class CreeperRecover extends JavaPlugin {
         Objects.requireNonNull(getCommand("recover")).setTabCompleter(new RecoverCommandTabCompleter());
 
         // Events
-        Bukkit.getPluginManager().registerEvents(new ExplosionListener(), this);
+        Bukkit.getPluginManager().registerEvents(new EntityExplodeListener(), this);
 
         // Tasks
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {

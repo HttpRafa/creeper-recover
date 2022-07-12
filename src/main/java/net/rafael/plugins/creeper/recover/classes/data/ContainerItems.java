@@ -1,4 +1,4 @@
-package net.rafael.plugins.creeper.recover.classes;
+package net.rafael.plugins.creeper.recover.classes.data;
 
 //------------------------------
 //
@@ -8,11 +8,13 @@ package net.rafael.plugins.creeper.recover.classes;
 //
 //------------------------------
 
+import org.bukkit.block.Block;
+import org.bukkit.block.Container;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 
-public class ExplodedBlockInventory {
+public class ContainerItems implements IBlockData {
 
     private final HashMap<Integer, ItemStack> items = new HashMap<>();
 
@@ -28,8 +30,13 @@ public class ExplodedBlockInventory {
         return items.getOrDefault(slot, null);
     }
 
-    public HashMap<Integer, ItemStack> getItems() {
-        return items;
+    @Override
+    public void apply(Block block, RecoverPhase phase) {
+        if(phase == RecoverPhase.POST_STATE_UPDATE && block.getState() instanceof Container container) {
+            for (Integer slot : items.keySet()) {
+                container.getInventory().setItem(slot, items.get(slot).clone());
+            }
+        }
     }
 
 }

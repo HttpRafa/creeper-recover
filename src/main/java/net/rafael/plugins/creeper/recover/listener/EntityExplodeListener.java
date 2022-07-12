@@ -19,7 +19,7 @@ import org.bukkit.event.entity.EntityExplodeEvent;
 import java.util.List;
 import java.util.Objects;
 
-public class ExplosionListener implements Listener {
+public class EntityExplodeListener implements Listener {
 
     @EventHandler
     public void on(EntityExplodeEvent event) {

@@ -9,18 +9,19 @@ package net.rafael.plugins.creeper.recover.classes;
 //------------------------------
 
 import net.rafael.plugins.creeper.recover.CreeperRecover;
+import net.rafael.plugins.creeper.recover.classes.data.ContainerItems;
+import net.rafael.plugins.creeper.recover.classes.data.SignColor;
+import net.rafael.plugins.creeper.recover.classes.data.SignLines;
 import net.rafael.plugins.creeper.recover.utils.MathUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.Chest;
-import org.bukkit.block.Container;
-import org.bukkit.block.DoubleChest;
+import org.bukkit.block.*;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.inventory.DoubleChestInventory;
 
 import java.util.*;
+import java.util.Comparator;
 
 public class Explosion {
 
@@ -41,16 +42,16 @@ public class Explosion {
                 tnt.setVelocity(MathUtils.calculateVectorBetween2Locations(MathUtils.toCenterLocation(location.clone()), MathUtils.toCenterLocation(block.getLocation().clone())).normalize().multiply(0.7));
                 continue;
             }
-            ExplodedBlockInventory inventory = null;
+            ExplodedBlock explodedBlock = new ExplodedBlock(block.getLocation().clone(), block.getType(), block.getBlockData().clone());
             if (block.getState() instanceof Container container) {
-                inventory = new ExplodedBlockInventory();
+                ContainerItems inventory = new ContainerItems();
                 for (int i = 0; i < container.getInventory().getStorageContents().length; i++) {
                     if (container.getInventory().getStorageContents()[i] != null) {
                         inventory.set(i, container.getInventory().getStorageContents()[i].clone());
                     }
                 }
+                explodedBlock.addData(inventory);
             }
-            ExplodedBlock explodedBlock = new ExplodedBlock(block.getLocation().clone(), block.getType(), block.getBlockData().clone(), inventory);
             if (block.getState() instanceof Chest chest) {
                 if (chest.getInventory() instanceof DoubleChestInventory doubleChestInventory) {
                     DoubleChest doubleChest = doubleChestInventory.getHolder();
@@ -62,14 +63,18 @@ public class Explosion {
                     assert rightSide != null;
                     if (block.getLocation().distance(leftSide.getBlock().getLocation()) < 0.1) {
                         ignoredBlocks.add(rightSide.getBlock());
-                        ExplodedBlock extraChest = new ExplodedBlock(rightSide.getBlock().getLocation().clone(), rightSide.getBlock().getType(), rightSide.getBlock().getBlockData().clone(), null);
+                        ExplodedBlock extraChest = new ExplodedBlock(rightSide.getBlock().getLocation().clone(), rightSide.getBlock().getType(), rightSide.getBlock().getBlockData().clone());
                         explodedBlock.connectBlock(extraChest);
                     } else if (block.getLocation().distance(rightSide.getBlock().getLocation()) < 0.1) {
                         ignoredBlocks.add(leftSide.getBlock());
-                        ExplodedBlock extraChest = new ExplodedBlock(leftSide.getBlock().getLocation().clone(), leftSide.getBlock().getType(), leftSide.getBlock().getBlockData().clone(), null);
+                        ExplodedBlock extraChest = new ExplodedBlock(leftSide.getBlock().getLocation().clone(), leftSide.getBlock().getType(), leftSide.getBlock().getBlockData().clone());
                         explodedBlock.connectBlock(extraChest);
                     }
                 }
+            }
+            if(block.getState() instanceof Sign sign) {
+                explodedBlock.addData(new SignLines(sign.getLines()));
+                explodedBlock.addData(new SignColor(sign.getColor()));
             }
             this.blocks.add(explodedBlock);
         }
