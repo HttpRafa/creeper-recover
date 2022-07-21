@@ -42,11 +42,12 @@ import de.rafael.plugins.creeper.recover.command.RecoverCommand;
 import de.rafael.plugins.creeper.recover.command.tab.RecoverCommandTabCompleter;
 import de.rafael.plugins.creeper.recover.config.ConfigManager;
 import de.rafael.plugins.creeper.recover.manager.ExplosionManager;
-import de.rafael.plugins.creeper.recover.stats.Metrics;
 import de.rafael.plugins.creeper.recover.stats.PluginStats;
 import de.rafael.plugins.creeper.recover.listener.EntityExplodeListener;
 import de.rafael.plugins.creeper.recover.update.PluginVersion;
 import de.rafael.plugins.creeper.recover.update.UpdateChecker;
+import org.bstats.bukkit.Metrics;
+import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
 import org.bukkit.plugin.java.JavaPlugin;
 
@@ -116,11 +117,11 @@ public class CreeperRecover extends JavaPlugin {
         if (this.configManager.isbStats()) {
             int pluginId = 14155;
             Metrics metrics = new Metrics(this, pluginId);
-            metrics.addCustomChart(new Metrics.SingleLineChart("blocksRecovered", () -> this.pluginStats.getBlocksRecovered()));
-            metrics.addCustomChart(new Metrics.SingleLineChart("explosionsRecovered", () -> this.pluginStats.getExplosionsRecovered()));
+            metrics.addCustomChart(new SingleLineChart("blocksRecovered", () -> this.pluginStats.getBlocksRecovered()));
+            metrics.addCustomChart(new SingleLineChart("explosionsRecovered", () -> this.pluginStats.getExplosionsRecovered()));
         }
         if(!this.configManager.isIgnoreUpdates()) {
-            this.updateChecker.isLastestVersion(version, aBoolean -> {
+            this.updateChecker.isLatestVersion(version, aBoolean -> {
                 if (!aBoolean) {
                     Bukkit.getConsoleSender().sendMessage(prefix + "§8--------------------------------------");
                     Bukkit.getConsoleSender().sendMessage(prefix + " ");
