@@ -1,42 +1,19 @@
 /*
- * Copyright (c) 2022. All rights reserved.
+ * This Metrics class was auto-generated and can be copied into your project if you are
+ * not using a build tool like Gradle or Maven for dependency management.
  *
- * Redistribution and use in source and binary forms, with or without
- * modification, are permitted provided that the following conditions are met:
+ * IMPORTANT: You are not allowed to modify this class, except changing the package.
  *
- *     * Redistributions of source code must retain the above copyright notice,
- *         this list of conditions and the following disclaimer.
- *     * Redistributions in binary form must reproduce the above copyright
- *         notice, this list of conditions and the following disclaimer in the
- *         documentation and/or other materials provided with the distribution.
- *     * Neither the name of the developer nor the names of its contributors
- *         may be used to endorse or promote products derived from this software
- *         without specific prior written permission.
- *     * Redistributions in source or binary form must keep the original package
- *         and class name.
+ * Unallowed modifications include but are not limited to:
+ *  - Remove the option for users to opt-out
+ *  - Change the frequency for data submission
+ *  - Obfuscate the code (every obfucator should allow you to make an exception for specific files)
+ *  - Reformat the code (if you use a linter, add an exception)
  *
- * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS
- * "AS IS" AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED
- * TO, THE IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR
- * PURPOSE ARE DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT OWNER OR
- * CONTRIBUTORS BE LIABLE FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL,
- * EXEMPLARY, OR CONSEQUENTIAL DAMAGES (INCLUDING, BUT NOT LIMITED TO,
- * PROCUREMENT OF SUBSTITUTE GOODS OR SERVICES; LOSS OF USE, DATA, OR
- * PROFITS; OR BUSINESS INTERRUPTION) HOWEVER CAUSED AND ON ANY THEORY OF
- * LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY, OR TORT (INCLUDING
- * NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE OF THIS
- * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+ * Violations will result in a ban of your plugin and account from bStats.
  */
 
 package de.rafael.plugins.creeper.recover.stats;
-
-//------------------------------
-//
-// This class was developed by Rafael K.
-// On 2/1/2022 at 10:25 PM
-// In the project CreeperRecover
-//
-//------------------------------
 
 import java.io.BufferedReader;
 import java.io.ByteArrayOutputStream;
