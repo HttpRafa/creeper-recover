@@ -57,7 +57,7 @@ public class UpdateChecker {
         this.resourceId = resourceId;
     }
 
-    public void getLastestVersion(Consumer<String> consumer) {
+    public void getLatestVersion(Consumer<String> consumer) {
         Bukkit.getScheduler().runTaskAsynchronously(CreeperRecover.getCreeperRecover(), () -> {
            try(InputStream inputStream = new URL("https://api.spigotmc.org/legacy/update.php?resource=" + this.resourceId).openStream()) {
                Scanner scanner = new Scanner(inputStream);
@@ -73,8 +73,8 @@ public class UpdateChecker {
         });
     }
 
-    public void isLastestVersion(PluginVersion currentVersion, Consumer<Boolean> consumer) {
-        getLastestVersion(latest -> {
+    public void isLatestVersion(PluginVersion currentVersion, Consumer<Boolean> consumer) {
+        getLatestVersion(latest -> {
             this.latestVersion = new PluginVersion().from(latest);
             if (this.latestVersion.compare(currentVersion) == 0) {
                 this.uptoDate = true;
