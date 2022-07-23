@@ -1,4 +1,5 @@
 plugins {
+    id 'com.github.johnrengelman.shadow' version '7.1.2'
     id 'java'
 }
 
@@ -32,11 +33,11 @@ dependencies {
     testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.2'
 }
 
-jar {
-    from {
-        configurations.runtimeClasspath.collect { it.isDirectory() ? it : zipTree(it) }
-    }
+shadowJar {
+    relocate 'org.bstats', 'de.rafael.plugins.creeper.recover.utils'
 }
+
+assemble.dependsOn shadowJar
 
 test {
     useJUnitPlatform()
