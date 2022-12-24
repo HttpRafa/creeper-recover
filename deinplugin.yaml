@@ -1,0 +1,120 @@
+specVersion: 1
+type: plugin
+name: CreeperRecover
+authors:
+  - HttpRafa
+supportedPlatforms:
+  - spigot
+  - paper
+supportedGameVersions: ^1.16.5
+category: protection
+introduction: Ein Plugin was Blöcke, die durch Explosionen zerstört wurden Wiederherstellt.
+description: '  
+  # Bilder
+  ![Example 1](https://i.postimg.cc/vHJMc4Qj/2021-12-31-17-53-38.gif)
+  
+  # Commands
+  ![Command 1](https://raw.githubusercontent.com/HttpRafa/CreeperRecover/master/images/command1.png)
+  ![Command 2](https://raw.githubusercontent.com/HttpRafa/CreeperRecover/master/images/command2.png)
+  
+  # Konfiguration
+  ```
+  {
+    "configVersion": 1,
+    "plugin": {
+      "bStats": true,
+      "ignoreUpdates": false
+    },
+    "recover": {
+      "recoverSpeed": 3,
+      "blockRecoverSound": "BLOCK_GRAVEL_PLACE"
+    },
+    "target": [
+      {
+        "type": "ENTITY",
+        "ignore": false,
+        "all": true,
+        "entityTypes": [
+          "CREEPER",
+          "PRIMED_TNT"
+        ]
+      },
+      {
+        "type": "HEIGHT_RANGE",
+        "ignore": false,
+        "from": -64,
+        "to": 320
+      },
+      {
+        "type": "HEIGHT_FIXED",
+        "ignore": true,
+        "fixed": 32
+      }
+    ]
+  }
+  ```
+  ## Optionen
+  ```
+  configVersion: Konfigurationsversion
+  bStats: Ob bStats aktiviert sein soll.
+  ignoreUpdates: Wenn keine Meldung in der Konsole angezeigt werden soll, wenn das Plugin ein Update hat.
+  recoverSpeed: Die Anzahl der Ticks zwischen jedem Block, der wiederhergestellt wird.
+  blockRecoverSound: Der Ton, der abgespielt werden soll, wenn das Plugin einen Block platziert.
+  target: In der Liste werden Regeln angegeben, wo das Plugin wirken soll.
+  ```
+  
+  ### Beispiel Entitäten
+  ```
+  CREEPER
+  PRIMED_TNT
+  SMALL_FIREBALL
+  FIREBALL
+  WITHER_SKULL
+  DRAGON_FIREBALL
+  ```
+  
+  # Konfigurations Beispiele[target]
+  ### Effect all entities
+  ```
+  {
+    "type": "ENTITY",
+    "ignore": false,
+    "all": true
+  }
+  ```
+  ### Effect only TnT and Creepers
+  ```
+  {
+    "type": "ENTITY",
+    "ignore": false,
+    "entityTypes": [
+      "CREEPER",
+      "PRIMED_TNT"
+    ]
+  }
+  ```
+  
+  ### Effect only from Y-0 to Y-320
+  ```
+  {
+    "type": "HEIGHT_RANGE",
+    "ignore": false,
+    "from": 0,
+    "to": 320
+  }
+  ```
+  
+  ### Effect only at Y-60
+  ```
+  {
+    "type": "HEIGHT_FIXED",
+    "ignore": false,
+    "fixed": 60
+  }
+  ```
+
+  # Download
+  #### SpigotMC: https://www.spigotmc.org/resources/creeper-recover.98836/.
+  #### DeinPlugin: Hopefully in the future'
+
+icon: https://raw.githubusercontent.com/HttpRafa/CreeperRecover/master/images/icon.png
