@@ -52,6 +52,8 @@ ignoreUpdates: If you don't want to receive a message in the console when the pl
 recoverSpeed: The amount of ticks between each block that is being recovered.
 blockRecoverSound: Is the sound played when the plugin places a block.
 target: In the list, rules are specified where the plugin should take effect.
+
+all: If set "all" to true entities will be affected. So if you want only TNT to be recorded then set "all" to false and define TNT in the entityTypes setting.
 ```
 
 ### Example Entities
