@@ -64,6 +64,8 @@ description:
     recoverSpeed: Die Anzahl der Ticks zwischen jedem Block, der wiederhergestellt wird.
     blockRecoverSound: Der Ton, der abgespielt werden soll, wenn das Plugin einen Block platziert.
     target: In der Liste werden Regeln angegeben, wo das Plugin wirken soll.
+    
+    all: Wenn "all" auf "true" gesetzt ist, sind alle Entitäten betroffen. Wenn Sie also möchten, dass nur TNT wiederhergestellt wird, setzen Sie "all" auf "false" und definieren Sie TNT in der Einstellung „entityTypes“.
     ```
   
     ### Beispiel Entitäten
@@ -167,6 +169,8 @@ description:
     recoverSpeed: The amount of ticks between each block that is being recovered.
     blockRecoverSound: Is the sound played when the plugin places a block.
     target: In the list, rules are specified where the plugin should take effect.
+    
+    all: If "all" is set to true all entities will be affected. So if you want only TNT to be recovered then set "all" to false and define TNT in the entityTypes setting.
     ```
   
     ### Example Entities
