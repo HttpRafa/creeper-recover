@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. All rights reserved.
+ * Copyright (c) 2022-2023. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -41,9 +41,9 @@ package de.rafael.plugins.creeper.recover;
 import de.rafael.plugins.creeper.recover.command.RecoverCommand;
 import de.rafael.plugins.creeper.recover.command.tab.RecoverCommandTabCompleter;
 import de.rafael.plugins.creeper.recover.config.ConfigManager;
+import de.rafael.plugins.creeper.recover.listener.EntityExplodeListener;
 import de.rafael.plugins.creeper.recover.manager.ExplosionManager;
 import de.rafael.plugins.creeper.recover.stats.PluginStats;
-import de.rafael.plugins.creeper.recover.listener.EntityExplodeListener;
 import de.rafael.plugins.creeper.recover.update.PluginVersion;
 import de.rafael.plugins.creeper.recover.update.UpdateChecker;
 import org.bstats.bukkit.Metrics;
@@ -65,8 +65,6 @@ public class CreeperRecover extends JavaPlugin {
     private PluginStats pluginStats;
 
     private UpdateChecker updateChecker;
-
-    private boolean paused = false;
 
     public static PluginVersion getVersion() {
         return version;
@@ -92,18 +90,10 @@ public class CreeperRecover extends JavaPlugin {
 
     @Override
     public void onDisable() {
-        int recovered = this.getExplosionManager().recoverBlocks();
+        int recovered = this.getExplosionManager().recoverBlocks(Integer.MAX_VALUE);
         Bukkit.getConsoleSender().sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§7The plugin recovered §b" + recovered + " §7blocks before the server §cstops§8.");
 
         this.pluginStats.save();
-    }
-
-    public void pause() {
-        this.paused = true;
-    }
-
-    public void resume() {
-        this.paused = false;
     }
 
     public static CreeperRecover getCreeperRecover() {
@@ -145,12 +135,7 @@ public class CreeperRecover extends JavaPlugin {
         Bukkit.getPluginManager().registerEvents(new EntityExplodeListener(), this);
 
         // Tasks
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
-            if (!paused) explosionManager.recoverBlock();
-        }, 0, this.configManager.getRecoverSpeed());
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> {
-            this.pluginStats.tick();
-        }, 0, 20 * 60 * 5);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> this.pluginStats.tick(), 0, 20 * 60 * 5);
     }
 
     public String getPrefix() {

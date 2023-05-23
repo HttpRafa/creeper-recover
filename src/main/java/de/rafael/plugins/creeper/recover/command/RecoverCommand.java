@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. All rights reserved.
+ * Copyright (c) 2022-2023. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -55,18 +55,14 @@ public class RecoverCommand implements CommandExecutor {
         if (args.length == 2 && args[0].equalsIgnoreCase("fix")) {
             try {
                 Bukkit.getScheduler().runTaskAsynchronously(CreeperRecover.getCreeperRecover(), () -> {
-                    CreeperRecover.getCreeperRecover().pause();
                     if (args[1].equalsIgnoreCase("all")) {
-                        int recovered = CreeperRecover.getCreeperRecover().getExplosionManager().recoverBlocks();
+                        int recovered = CreeperRecover.getCreeperRecover().getExplosionManager().recoverBlocks(Integer.MAX_VALUE);
                         sender.sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§b" + recovered + " §7blocks recovered§8.");
                     } else {
                         int amount = Integer.parseInt(args[1]);
                         int recovered = CreeperRecover.getCreeperRecover().getExplosionManager().recoverBlocks(amount);
                         sender.sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§b" + recovered + " §7blocks recovered§8.");
                     }
-                    Bukkit.getScheduler().runTaskLater(CreeperRecover.getCreeperRecover(), () -> {
-                        CreeperRecover.getCreeperRecover().resume();
-                    }, 5);
                 });
             } catch (NumberFormatException exception) {
                 sender.sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§c" + exception.getMessage());

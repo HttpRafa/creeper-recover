@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. All rights reserved.
+ * Copyright (c) 2022-2023. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -38,20 +38,23 @@ package de.rafael.plugins.creeper.recover.classes;
 //
 //------------------------------
 
-import de.rafael.plugins.creeper.recover.classes.data.ContainerItems;
 import de.rafael.plugins.creeper.recover.CreeperRecover;
-import de.rafael.plugins.creeper.recover.classes.data.SignColor;
+import de.rafael.plugins.creeper.recover.classes.data.InventoryItems;
 import de.rafael.plugins.creeper.recover.classes.data.SignLines;
+import de.rafael.plugins.creeper.recover.classes.data.SignStyle;
 import de.rafael.plugins.creeper.recover.utils.MathUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
-import org.bukkit.block.*;
+import org.bukkit.block.Block;
+import org.bukkit.block.Chest;
+import org.bukkit.block.DoubleChest;
+import org.bukkit.block.Sign;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.inventory.DoubleChestInventory;
+import org.bukkit.inventory.InventoryHolder;
 
 import java.util.*;
-import java.util.Comparator;
 
 public class Explosion {
 
@@ -73,11 +76,11 @@ public class Explosion {
                 continue;
             }
             ExplodedBlock explodedBlock = new ExplodedBlock(block.getLocation().clone(), block.getType(), block.getBlockData().clone());
-            if (block.getState() instanceof Container container) {
-                ContainerItems inventory = new ContainerItems();
-                for (int i = 0; i < container.getInventory().getStorageContents().length; i++) {
-                    if (container.getInventory().getStorageContents()[i] != null) {
-                        inventory.set(i, container.getInventory().getStorageContents()[i].clone());
+            if (block.getState() instanceof InventoryHolder holder) {
+                InventoryItems inventory = new InventoryItems();
+                for (int i = 0; i < holder.getInventory().getStorageContents().length; i++) {
+                    if (holder.getInventory().getStorageContents()[i] != null) {
+                        inventory.set(i, holder.getInventory().getStorageContents()[i].clone());
                     }
                 }
                 explodedBlock.addData(inventory);
@@ -104,50 +107,44 @@ public class Explosion {
             }
             if(block.getState() instanceof Sign sign) {
                 explodedBlock.addData(new SignLines(sign.getLines()));
-                explodedBlock.addData(new SignColor(sign.getColor()));
+                explodedBlock.addData(new SignStyle(sign.getColor(), sign.isGlowingText(), sign.isEditable()));
             }
             this.blocks.add(explodedBlock);
         }
     }
 
-    public void recoverBlock() {
+    public synchronized boolean recoverBlock() {
         Iterator<ExplodedBlock> iterator = this.blocks.iterator();
         if (iterator.hasNext()) {
             ExplodedBlock block = iterator.next();
             block.recover();
-            try {
-                iterator.remove();
-            } catch (ConcurrentModificationException ignored) {
-
-            }
+            iterator.remove();
+            return iterator.hasNext();
         } else {
             this.blocks.clear();
+            return false;
         }
     }
 
     public int recoverBlocks() {
         int recovered = 0;
-        Iterator<ExplodedBlock> iterator = this.blocks.iterator();
-        while (iterator.hasNext()) {
-            ExplodedBlock block = iterator.next();
-            block.recover();
+        while (recoverBlock()) {
             recovered++;
-            iterator.remove();
         }
         return recovered;
     }
 
     public int recoverBlocks(int amount) {
         int recovered = 0;
-        Iterator<ExplodedBlock> iterator = this.blocks.iterator();
-        while (iterator.hasNext()) {
+        while (true) {
             if (recovered >= amount) {
                 break;
             }
-            ExplodedBlock block = iterator.next();
-            block.recover();
+            if (!recoverBlock()) {
+                recovered++;
+                break;
+            }
             recovered++;
-            iterator.remove();
         }
         return recovered;
     }
