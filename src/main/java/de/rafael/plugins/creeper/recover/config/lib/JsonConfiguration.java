@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. All rights reserved.
+ * Copyright (c) 2022-2023. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -75,6 +75,45 @@ public class JsonConfiguration {
         return file;
     }
 
+    public static JsonConfiguration loadConfig(File folder, String fileName) {
+
+        if(!folder.exists()) {
+            folder.mkdirs();
+        }
+
+        File file = new File(folder.getPath() + "/" + fileName);
+
+        JsonObject jsonObject = new JsonObject();
+
+        if(!file.exists()) {
+            try {
+                file.createNewFile();
+
+                FileWriter fileWriter = new FileWriter(file);
+                fileWriter.write("{}");
+                fileWriter.flush();
+                fileWriter.close();
+            } catch (IOException exception) {
+                exception.printStackTrace();
+            }
+        } else {
+
+            try {
+
+                JsonReader jsonReader = new JsonReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
+
+                jsonObject = JsonParser.parseReader(jsonReader).getAsJsonObject();
+
+            } catch (FileNotFoundException exception) {
+                exception.printStackTrace();
+            }
+
+        }
+
+        return new JsonConfiguration(file, jsonObject);
+
+    }
+
     public void saveConfig() {
 
         Gson gson = new GsonBuilder().disableHtmlEscaping().serializeNulls().setPrettyPrinting().create();
@@ -88,50 +127,9 @@ public class JsonConfiguration {
             } finally {
                 out.close();
             }
-        } catch (IOException e) {
-            e.printStackTrace();
+        } catch (IOException exception) {
+            exception.printStackTrace();
         }
-
-    }
-
-    public static JsonConfiguration loadConfig(File folder, String fileName) {
-
-        if(!folder.exists()) {
-            folder.mkdirs();
-        }
-
-        File file = new File(folder.getPath() + "/" + fileName);
-
-        JsonObject jsonObject = new JsonObject();
-
-        if(!file.exists()) {
-            try {
-
-                file.createNewFile();
-
-                FileWriter fileWriter = new FileWriter(file);
-                fileWriter.write("{}");
-                fileWriter.flush();
-                fileWriter.close();
-
-            } catch (IOException e) {
-                e.printStackTrace();
-            }
-        } else {
-
-            try {
-
-                JsonReader jsonReader = new JsonReader(new InputStreamReader(new FileInputStream(file), StandardCharsets.UTF_8));
-
-                jsonObject = new JsonParser().parse(jsonReader).getAsJsonObject();
-
-            } catch (FileNotFoundException e) {
-                e.printStackTrace();
-            }
-
-        }
-
-        return new JsonConfiguration(file, jsonObject);
 
     }
 

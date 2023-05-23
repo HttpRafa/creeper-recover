@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. All rights reserved.
+ * Copyright (c) 2022-2023. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -42,12 +42,14 @@ import org.bukkit.DyeColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 
-public record SignColor(DyeColor dyeColor) implements IBlockData {
+public record SignStyle(DyeColor dyeColor, boolean glowing, boolean editable) implements IBlockData {
 
     @Override
     public void apply(Block block, RecoverPhase phase) {
-        if(phase == RecoverPhase.POST_STATE_UPDATE && block.getState() instanceof Sign sign) {
+        if (phase == RecoverPhase.POST_STATE_UPDATE && block.getState() instanceof Sign sign) {
             sign.setColor(dyeColor);
+            sign.setGlowingText(glowing);
+            sign.setEditable(editable);
             sign.update(true, false);
         }
     }

@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. All rights reserved.
+ * Copyright (c) 2022-2023. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -38,12 +38,12 @@ package de.rafael.plugins.creeper.recover.manager;
 //
 //------------------------------
 
-import de.rafael.plugins.creeper.recover.classes.Explosion;
 import de.rafael.plugins.creeper.recover.CreeperRecover;
+import de.rafael.plugins.creeper.recover.classes.Explosion;
 import org.bukkit.Bukkit;
 
 import java.util.ArrayList;
-import java.util.ConcurrentModificationException;
+import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 
@@ -53,57 +53,30 @@ public class ExplosionManager {
 
     public void handle(Explosion explosion) {
         this.explosionList.add(explosion);
-    }
-
-    public void recoverBlock() {
-        if(this.explosionList.size() > 0) {
-            Bukkit.getScheduler().runTask(CreeperRecover.getCreeperRecover(), () -> {
-                Iterator<Explosion> iterator = this.explosionList.iterator();
-                if(iterator.hasNext()) {
-                    Explosion explosion = iterator.next();
-                    explosion.recoverBlock();
-                    if (explosion.isFinished()) {
-                        explosion.finished();
-                        try {
-                            iterator.remove();
-                        } catch (ConcurrentModificationException ignored) {
-
-                        }
-                    }
-                }
-            });
-        }
-    }
-
-    public int recoverBlocks() {
-        int recovered = 0;
-        Iterator<Explosion> iterator = this.explosionList.iterator();
-        while (iterator.hasNext()) {
-            Explosion explosion = iterator.next();
-            recovered += explosion.recoverBlocks();
-            if (explosion.isFinished()) {
-                explosion.finished();
-                iterator.remove();
-            }
-        }
-        return recovered;
+        List<Explosion> explosions = Collections.singletonList(explosion);
+        Bukkit.getScheduler().runTaskTimerAsynchronously(CreeperRecover.getCreeperRecover(), task -> {
+            recoverBlocks(explosions, false, 1);
+            if (explosion.isFinished()) task.cancel();
+        }, 0, CreeperRecover.getCreeperRecover().getConfigManager().getRecoverSpeed());
     }
 
     public int recoverBlocks(int amount) {
-        int recovered = 0;
-        Iterator<Explosion> iterator = this.explosionList.iterator();
-        while (iterator.hasNext()) {
-            if (recovered >= amount) {
-                break;
+        return recoverBlocks(this.explosionList, true, amount);
+    }
+
+    public synchronized int recoverBlocks(List<Explosion> explosions, boolean removeFinished, int amount) {
+        if (explosions.size() > 0) {
+            Iterator<Explosion> iterator = explosions.iterator();
+            int recovered = 0;
+            while (recovered < amount && iterator.hasNext()) {
+                Explosion explosion = iterator.next();
+                recovered += explosion.recoverBlocks(amount);
+                if (removeFinished && explosion.isFinished()) iterator.remove();
             }
-            Explosion explosion = iterator.next();
-            recovered += explosion.recoverBlocks((amount - recovered));
-            if (explosion.isFinished()) {
-                explosion.finished();
-                iterator.remove();
-            }
+            return recovered;
+        } else {
+            return 0;
         }
-        return recovered;
     }
 
 }
