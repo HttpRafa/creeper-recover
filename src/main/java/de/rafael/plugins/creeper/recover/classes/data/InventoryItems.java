@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. All rights reserved.
+ * Copyright (c) 2022-2023. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -39,17 +39,17 @@ package de.rafael.plugins.creeper.recover.classes.data;
 //------------------------------
 
 import org.bukkit.block.Block;
-import org.bukkit.block.Container;
+import org.bukkit.inventory.InventoryHolder;
 import org.bukkit.inventory.ItemStack;
 
 import java.util.HashMap;
 
-public class ContainerItems implements IBlockData {
+public class InventoryItems implements IBlockData {
 
     private final HashMap<Integer, ItemStack> items = new HashMap<>();
 
     public void set(int slot, ItemStack stack) {
-        if(items.containsKey(slot)) {
+        if (items.containsKey(slot)) {
             items.replace(slot, stack);
         } else {
             items.put(slot, stack);
@@ -62,9 +62,9 @@ public class ContainerItems implements IBlockData {
 
     @Override
     public void apply(Block block, RecoverPhase phase) {
-        if(phase == RecoverPhase.POST_STATE_UPDATE && block.getState() instanceof Container container) {
+        if (phase == RecoverPhase.POST_STATE_UPDATE && block.getState() instanceof InventoryHolder holder) {
             for (Integer slot : items.keySet()) {
-                container.getInventory().setItem(slot, items.get(slot).clone());
+                holder.getInventory().setItem(slot, items.get(slot).clone());
             }
         }
     }

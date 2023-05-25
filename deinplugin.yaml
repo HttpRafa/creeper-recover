@@ -6,7 +6,7 @@ authors:
 supportedPlatforms:
   - spigot
   - paper
-supportedGameVersions: ^1.16.5
+supportedGameVersions: ^1.19.4
 category: protection
 introduction:
   de: 'Ein Plugin was Blöcke, die durch Explosionen zerstört wurden Wiederherstellt'
