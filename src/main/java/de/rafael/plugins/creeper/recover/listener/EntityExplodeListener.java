@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. All rights reserved.
+ * Copyright (c) 2022-2023. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -40,35 +40,35 @@ package de.rafael.plugins.creeper.recover.listener;
 
 import de.rafael.plugins.creeper.recover.CreeperRecover;
 import de.rafael.plugins.creeper.recover.classes.Explosion;
-import org.bukkit.*;
+import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
 import java.util.List;
-import java.util.Objects;
 
 public class EntityExplodeListener implements Listener {
 
+    public static final List<Material> IGNORE_MATERIALS = List.of();
+
     @EventHandler
     public void on(EntityExplodeEvent event) {
-
-        if(CreeperRecover.getCreeperRecover().getConfigManager().usePlugin(event)) {
+        if (CreeperRecover.getCreeperRecover().getConfigManager().usePlugin(event)) {
             List<Block> blocks = event.blockList();
+
+            // Disable damage by explosion
+            event.setYield(100);
+            //blocks.removeIf(block -> IGNORE_MATERIALS.contains(block.getType()));
+
+            // Store blocks
             CreeperRecover.getCreeperRecover().getExplosionManager().handle(new Explosion(event.getLocation().clone(), blocks));
 
-            event.setCancelled(true);
-            event.setYield(0);
-
-            Objects.requireNonNull(event.getLocation().getWorld()).playSound(event.getLocation(), Sound.ENTITY_GENERIC_EXPLODE, 1f, 1f);
-            event.getLocation().getWorld().spawnParticle(Particle.EXPLOSION_LARGE, event.getLocation(), 0);
-
+            // Remove blocks
             for (Block block : blocks) {
                 block.setType(Material.AIR, false);
             }
         }
-
     }
 
 }
