@@ -41,6 +41,7 @@ package de.rafael.plugins.creeper.recover.manager;
 import de.rafael.plugins.creeper.recover.CreeperRecover;
 import de.rafael.plugins.creeper.recover.classes.Explosion;
 import org.bukkit.Bukkit;
+import org.bukkit.Location;
 
 import java.util.ArrayList;
 import java.util.Collections;
@@ -49,10 +50,12 @@ import java.util.List;
 
 public class ExplosionManager {
 
+    private final List<Location> suppressedLocations = new ArrayList<>();
     private final List<Explosion> explosionList = new ArrayList<>();
 
     public void handle(Explosion explosion) {
         this.explosionList.add(explosion);
+        explosion.getBlocks().forEach(explodedBlock -> this.suppress(explodedBlock.getLocation()));
         List<Explosion> explosions = Collections.singletonList(explosion);
         Bukkit.getScheduler().runTaskTimerAsynchronously(CreeperRecover.getCreeperRecover(), task -> {
             recoverBlocks(explosions, false, 1);
@@ -77,6 +80,22 @@ public class ExplosionManager {
         } else {
             return 0;
         }
+    }
+
+    public boolean hasSuppressed() {
+        return this.suppressedLocations.size() > 0;
+    }
+
+    public void suppress(Location location) {
+        this.suppressedLocations.add(location);
+    }
+
+    public void free(Location location) {
+        this.suppressedLocations.remove(location);
+    }
+
+    public boolean isSuppressed(Location location) {
+        return this.suppressedLocations.contains(location);
     }
 
 }
