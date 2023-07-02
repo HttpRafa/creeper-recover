@@ -59,7 +59,6 @@ public class ConfigManager {
     public static final int latestConfigVersion = 1;
 
     private int recoverSpeed = 3;
-    private int currentConfigVersion = -1;
 
     private Sound blockRecoverSound;
 
@@ -85,9 +84,9 @@ public class ConfigManager {
 
             return false;
         } else {
-            this.currentConfigVersion = jsonConfiguration.getJson().get("configVersion").getAsInt();
-            if(this.currentConfigVersion < latestConfigVersion) {
-                updateConfig(this.currentConfigVersion, latestConfigVersion);
+            int currentConfigVersion = jsonConfiguration.getJson().get("configVersion").getAsInt();
+            if(currentConfigVersion < latestConfigVersion) {
+                updateConfig(currentConfigVersion, latestConfigVersion);
                 return false;
             }
         }

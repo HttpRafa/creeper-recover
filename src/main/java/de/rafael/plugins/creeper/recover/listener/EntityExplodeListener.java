@@ -42,10 +42,12 @@ import de.rafael.plugins.creeper.recover.CreeperRecover;
 import de.rafael.plugins.creeper.recover.classes.Explosion;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
+import org.bukkit.block.HangingSign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class EntityExplodeListener implements Listener {
@@ -58,16 +60,16 @@ public class EntityExplodeListener implements Listener {
             List<Block> blocks = event.blockList();
 
             // Disable damage by explosion
-            event.setYield(100);
-            //blocks.removeIf(block -> IGNORE_MATERIALS.contains(block.getType()));
+            event.setYield(0);
+            // blocks.removeIf(block -> IGNORE_MATERIALS.contains(block.getType()));
 
             // Store blocks
             CreeperRecover.getCreeperRecover().getExplosionManager().handle(new Explosion(event.getLocation().clone(), blocks));
 
-            // Remove blocks
-            for (Block block : blocks) {
-                block.setType(Material.AIR, false);
-            }
+            // Remove all blocks without collision. To prevent redstone and other blocks from being without support blocks.
+            blocks.stream().filter(Block::isPassable).forEach(block -> block.setType(Material.AIR, false));
+            // Remove the rest of the blocks
+            blocks.stream().filter(block -> !block.isPassable()).forEach(block -> block.setType(Material.AIR, false));
         }
     }
 
