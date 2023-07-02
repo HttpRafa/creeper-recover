@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. All rights reserved.
+ * Copyright (c) 2023. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -30,46 +30,22 @@
 
 package de.rafael.plugins.creeper.recover.listener;
 
-//------------------------------
-//
-// This class was developed by Rafael K.
-// On 31.12.2021 at 12:37
-// In the project CreeperRecover
-//
-//------------------------------
-
 import de.rafael.plugins.creeper.recover.CreeperRecover;
-import de.rafael.plugins.creeper.recover.classes.Explosion;
-import org.bukkit.Material;
-import org.bukkit.block.Block;
-import org.bukkit.block.HangingSign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.event.block.BlockPhysicsEvent;
 
-import java.util.ArrayList;
-import java.util.List;
+/**
+ * @author Rafael K.
+ * @since 02/07/2023
+ */
 
-public class EntityExplodeListener implements Listener {
-
-    public static final List<Material> IGNORE_MATERIALS = List.of();
+public class BlockPhysicsListener implements Listener {
 
     @EventHandler
-    public void on(EntityExplodeEvent event) {
-        if (CreeperRecover.getCreeperRecover().getConfigManager().usePlugin(event)) {
-            List<Block> blocks = event.blockList();
-
-            // Disable damage by explosion
-            event.setYield(0);
-            // blocks.removeIf(block -> IGNORE_MATERIALS.contains(block.getType()));
-
-            // Store blocks
-            CreeperRecover.getCreeperRecover().getExplosionManager().handle(new Explosion(event.getLocation().clone(), blocks));
-
-            // Remove all blocks without collision. To prevent redstone and other blocks from being without support blocks.
-            blocks.stream().filter(Block::isPassable).forEach(block -> block.setType(Material.AIR, false));
-            // Remove the rest of the blocks
-            blocks.stream().filter(block -> !block.isPassable()).forEach(block -> block.setType(Material.AIR, false));
+    public void on(BlockPhysicsEvent event) {
+        if(CreeperRecover.getCreeperRecover().getExplosionManager().hasSuppressedBlocks() && CreeperRecover.getCreeperRecover().getExplosionManager().isBlockSuppressed(event.getBlock().getLocation())) {
+            event.setCancelled(true);
         }
     }
 
