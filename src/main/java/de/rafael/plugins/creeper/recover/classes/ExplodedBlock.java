@@ -124,7 +124,7 @@ public class ExplodedBlock {
     }
 
     public void recoverBasics() {
-        CreeperRecover.getCreeperRecover().getExplosionManager().free(this.location);
+        CreeperRecover.getCreeperRecover().getExplosionManager().freeBlock(this.location);
         Block block = this.location.getBlock();
         block.setType(this.material, false);
         block.setBlockData(this.data, false);

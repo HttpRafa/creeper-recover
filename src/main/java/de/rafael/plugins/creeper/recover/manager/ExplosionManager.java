@@ -55,7 +55,7 @@ public class ExplosionManager {
 
     public void handle(Explosion explosion) {
         this.explosionList.add(explosion);
-        explosion.getBlocks().forEach(explodedBlock -> this.suppress(explodedBlock.getLocation()));
+        explosion.getBlocks().forEach(explodedBlock -> this.suppressBlock(explodedBlock.getLocation()));
         List<Explosion> explosions = Collections.singletonList(explosion);
         Bukkit.getScheduler().runTaskTimerAsynchronously(CreeperRecover.getCreeperRecover(), task -> {
             recoverBlocks(explosions, false, 1);
@@ -82,19 +82,19 @@ public class ExplosionManager {
         }
     }
 
-    public boolean hasSuppressed() {
+    public boolean hasSuppressedBlocks() {
         return this.suppressedLocations.size() > 0;
     }
 
-    public void suppress(Location location) {
+    public void suppressBlock(Location location) {
         this.suppressedLocations.add(location);
     }
 
-    public void free(Location location) {
+    public void freeBlock(Location location) {
         this.suppressedLocations.remove(location);
     }
 
-    public boolean isSuppressed(Location location) {
+    public boolean isBlockSuppressed(Location location) {
         return this.suppressedLocations.contains(location);
     }
 

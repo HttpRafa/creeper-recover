@@ -44,7 +44,7 @@ public class BlockPhysicsListener implements Listener {
 
     @EventHandler
     public void on(BlockPhysicsEvent event) {
-        if(CreeperRecover.getCreeperRecover().getExplosionManager().hasSuppressed() && CreeperRecover.getCreeperRecover().getExplosionManager().isSuppressed(event.getBlock().getLocation())) {
+        if(CreeperRecover.getCreeperRecover().getExplosionManager().hasSuppressedBlocks() && CreeperRecover.getCreeperRecover().getExplosionManager().isBlockSuppressed(event.getBlock().getLocation())) {
             event.setCancelled(true);
         }
     }
