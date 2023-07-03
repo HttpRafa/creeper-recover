@@ -40,6 +40,7 @@ package de.rafael.plugins.creeper.recover.config.enums;
 
 public enum TargetTypes {
 
+    WORLD,
     ENTITY,
     HEIGHT_RANGE,
     HEIGHT_FIXED
