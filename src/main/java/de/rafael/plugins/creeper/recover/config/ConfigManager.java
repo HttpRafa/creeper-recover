@@ -54,14 +54,16 @@ import java.io.File;
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ConfigManager {
 
     public static final Gson GSON = new GsonBuilder().create();
 
-    public static final int latestConfigVersion = 1;
+    public static final int latestConfigVersion = 2;
 
     private int recoverSpeed = 3;
+    private int recoverDelay = 20 * 5;
 
     private Sound blockRecoverSound;
     private List<Material> blockBlacklist = new ArrayList<>();
@@ -129,6 +131,14 @@ public class ConfigManager {
         } else {
             this.recoverSpeed = jsonConfiguration.getJson().getAsJsonObject("recover").get("recoverSpeed").getAsInt();
         }
+        if(!jsonConfiguration.getJson().getAsJsonObject("recover").has("recoverDelay")) {
+            jsonConfiguration.getJson().getAsJsonObject("recover").addProperty("recoverDelay", this.recoverDelay);
+            jsonConfiguration.saveConfig();
+
+            return false;
+        } else {
+            this.recoverDelay = jsonConfiguration.getJson().getAsJsonObject("recover").get("recoverDelay").getAsInt();
+        }
         if(!jsonConfiguration.getJson().getAsJsonObject("recover").has("blockRecoverSound")) {
             jsonConfiguration.getJson().getAsJsonObject("recover").addProperty("blockRecoverSound", this.blockRecoverSound.name());
             jsonConfiguration.saveConfig();
@@ -150,30 +160,45 @@ public class ConfigManager {
         if(!jsonConfiguration.getJson().has("target")) {
             JsonArray jsonArray = new JsonArray();
 
-            JsonObject allEntries = new JsonObject();
-            allEntries.addProperty("type", TargetTypes.ENTITY.name());
-            allEntries.addProperty("ignore", false);
-            allEntries.addProperty("all", true);
+            {
+                JsonObject worldTarget = new JsonObject();
+                worldTarget.addProperty("type", TargetTypes.WORLD.name());
+                worldTarget.addProperty("ignore", true);
 
-            JsonArray entityTypes = new JsonArray();
-            entityTypes.add(EntityType.CREEPER.name());
-            entityTypes.add(EntityType.PRIMED_TNT.name());
+                worldTarget.add("whitelist", new JsonArray());
+                worldTarget.add("blacklist", new JsonArray());
+                jsonArray.add(worldTarget);
+            }
 
-            allEntries.add("entityTypes", entityTypes);
-            jsonArray.add(allEntries);
+            {
+                JsonObject entityTarget = new JsonObject();
+                entityTarget.addProperty("type", TargetTypes.ENTITY.name());
+                entityTarget.addProperty("ignore", true);
 
-            JsonObject rangeHeight = new JsonObject();
-            rangeHeight.addProperty("type", TargetTypes.HEIGHT_RANGE.name());
-            rangeHeight.addProperty("ignore", false);
-            rangeHeight.addProperty("from", -64);
-            rangeHeight.addProperty("to", 320);
-            jsonArray.add(rangeHeight);
+                JsonArray entityTypes = new JsonArray();
+                entityTypes.add(EntityType.CREEPER.name());
+                entityTypes.add(EntityType.PRIMED_TNT.name());
 
-            JsonObject fixedHeight = new JsonObject();
-            fixedHeight.addProperty("type", TargetTypes.HEIGHT_FIXED.name());
-            fixedHeight.addProperty("ignore", true);
-            fixedHeight.addProperty("fixed", 32);
-            jsonArray.add(fixedHeight);
+                entityTarget.add("entityTypes", entityTypes);
+                jsonArray.add(entityTarget);
+            }
+
+            {
+                JsonObject rangeHeight = new JsonObject();
+                rangeHeight.addProperty("type", TargetTypes.HEIGHT_RANGE.name());
+                rangeHeight.addProperty("ignore", true);
+                rangeHeight.addProperty("from", -64);
+                rangeHeight.addProperty("to", 320);
+                jsonArray.add(rangeHeight);
+            }
+
+            {
+                JsonObject fixedHeight = new JsonObject();
+                fixedHeight.addProperty("type", TargetTypes.HEIGHT_FIXED.name());
+                fixedHeight.addProperty("ignore", true);
+                fixedHeight.addProperty("fixed", 32);
+                jsonArray.add(fixedHeight);
+            }
 
             jsonConfiguration.getJson().add("target", jsonArray);
             jsonConfiguration.saveConfig();
@@ -193,6 +218,10 @@ public class ConfigManager {
 
     public int getRecoverSpeed() {
         return recoverSpeed;
+    }
+
+    public int getRecoverDelay() {
+        return recoverDelay;
     }
 
     public Sound getBlockRecoverSound() {
@@ -218,14 +247,29 @@ public class ConfigManager {
     public boolean usePlugin(EntityExplodeEvent event) {
         boolean usePlugin = true;
 
+        // World
+        List<JsonObject> worldTargets = this.targetList.stream().filter(item -> item.get("type").getAsString().equals(TargetTypes.WORLD.name())).toList();
+        for (JsonObject worldTarget : worldTargets) {
+            if(!worldTarget.get("ignore").getAsBoolean()) {
+                if(worldTarget.has("whitelist")) {
+                    JsonArray whiteList = worldTarget.getAsJsonArray("whitelist");
+                    if(whiteList.size() > 0 && whiteList.asList().stream().map(JsonElement::getAsString).noneMatch(s -> Objects.requireNonNull(event.getLocation().getWorld()).getName().equalsIgnoreCase(s))) {
+                        usePlugin = false;
+                    }
+                }
+                if(worldTarget.has("blacklist")) {
+                    JsonArray blacklist = worldTarget.getAsJsonArray("blacklist");
+                    if(blacklist.size() > 0 && blacklist.asList().stream().map(JsonElement::getAsString).anyMatch(s -> Objects.requireNonNull(event.getLocation().getWorld()).getName().equalsIgnoreCase(s))) {
+                        usePlugin = false;
+                    }
+                }
+            }
+        }
+
         // Entity
         List<JsonObject> entityTargets = this.targetList.stream().filter(item -> item.get("type").getAsString().equals(TargetTypes.ENTITY.name())).toList();
         for (JsonObject entityTarget : entityTargets) {
             if(!entityTarget.get("ignore").getAsBoolean()) {
-                if(entityTarget.has("all") && entityTarget.get("all").getAsBoolean()) {
-                    continue;
-                }
-
                 List<EntityType> entityTypes = new ArrayList<>();
                 for (JsonElement types : entityTarget.get("entityTypes").getAsJsonArray()) {
                     entityTypes.add(EntityType.valueOf(types.getAsString()));
@@ -299,6 +343,25 @@ public class ConfigManager {
             jsonConfiguration.getJson().getAsJsonObject("recover").add("recoverSpeed", recoverSpeed);
 
             jsonConfiguration.getJson().add("target", targetList);
+
+            jsonConfiguration.saveConfig();
+            success = true;
+        } else if(from == 1 && to == 2) {
+            JsonConfiguration jsonConfiguration = JsonConfiguration.loadConfig(configFolder, configFileName);
+            jsonConfiguration.getJson().addProperty("configVersion", to);
+
+            JsonArray targets = jsonConfiguration.getJson().getAsJsonArray("target");
+            targets.forEach(jsonElement -> {
+                JsonObject target = jsonElement.getAsJsonObject();
+                if(target.get("type").getAsString().equalsIgnoreCase(TargetTypes.ENTITY.name())) {
+                    if(target.has("all")) {
+                        if(target.get("all").getAsBoolean()) {
+                            target.addProperty("ignore", true);
+                        }
+                        target.remove("all");
+                    }
+                }
+            });
 
             jsonConfiguration.saveConfig();
             success = true;
