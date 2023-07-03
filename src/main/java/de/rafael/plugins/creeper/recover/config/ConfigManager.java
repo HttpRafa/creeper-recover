@@ -38,24 +38,27 @@ package de.rafael.plugins.creeper.recover.config;
 //
 //------------------------------
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonObject;
+import com.google.gson.*;
+import com.google.gson.reflect.TypeToken;
 import de.rafael.plugins.creeper.recover.config.lib.JsonConfiguration;
 import de.rafael.plugins.creeper.recover.CreeperRecover;
 import de.rafael.plugins.creeper.recover.config.enums.TargetTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
+import org.bukkit.Material;
 import org.bukkit.Sound;
 import org.bukkit.entity.EntityType;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
 import java.io.File;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
 public class ConfigManager {
+
+    public static final Gson GSON = new GsonBuilder().create();
 
     public static final int latestConfigVersion = 2;
 
@@ -63,6 +66,7 @@ public class ConfigManager {
     private int recoverDelay = 20 * 5;
 
     private Sound blockRecoverSound;
+    private List<Material> blockBlacklist = new ArrayList<>();
 
     private boolean bStats = true;
     private boolean ignoreUpdates = false;
@@ -143,6 +147,14 @@ public class ConfigManager {
         } else {
             this.blockRecoverSound = Sound.valueOf(jsonConfiguration.getJson().getAsJsonObject("recover").get("blockRecoverSound").getAsString());
         }
+        if(!jsonConfiguration.getJson().getAsJsonObject("recover").has("blockBlacklist")) {
+            jsonConfiguration.getJson().getAsJsonObject("recover").add("blockBlacklist", GSON.toJsonTree(this.blockBlacklist, new TypeToken<List<Material>>() {}.getType()));
+            jsonConfiguration.saveConfig();
+
+            return false;
+        } else {
+            this.blockBlacklist = GSON.fromJson(jsonConfiguration.getJson().getAsJsonObject("recover").getAsJsonArray("blockBlacklist"), new TypeToken<List<Material>>() {}.getType());
+        }
 
         // Target
         if(!jsonConfiguration.getJson().has("target")) {
@@ -214,6 +226,10 @@ public class ConfigManager {
 
     public Sound getBlockRecoverSound() {
         return blockRecoverSound;
+    }
+
+    public List<Material> getBlockBlacklist() {
+        return blockBlacklist;
     }
 
     public boolean isIgnoreUpdates() {

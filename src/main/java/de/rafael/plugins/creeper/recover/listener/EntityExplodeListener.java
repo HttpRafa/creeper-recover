@@ -52,16 +52,14 @@ import java.util.List;
 
 public class EntityExplodeListener implements Listener {
 
-    public static final List<Material> IGNORE_MATERIALS = List.of();
-
     @EventHandler
     public void on(EntityExplodeEvent event) {
         if (CreeperRecover.getCreeperRecover().getConfigManager().usePlugin(event)) {
             List<Block> blocks = event.blockList();
 
             // Disable damage by explosion
-            event.setYield(0);
-            // blocks.removeIf(block -> IGNORE_MATERIALS.contains(block.getType()));
+            event.setYield(100);
+            blocks.removeIf(block -> CreeperRecover.getCreeperRecover().getConfigManager().getBlockBlacklist().contains(block.getType()));
 
             // Store blocks
             CreeperRecover.getCreeperRecover().getExplosionManager().handle(new Explosion(event.getLocation().clone(), blocks));
