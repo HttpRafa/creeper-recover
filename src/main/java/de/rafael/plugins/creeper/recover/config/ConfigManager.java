@@ -59,6 +59,7 @@ public class ConfigManager {
     public static final int latestConfigVersion = 1;
 
     private int recoverSpeed = 3;
+    private int recoverDelay = 20 * 5;
 
     private Sound blockRecoverSound;
 
@@ -125,6 +126,14 @@ public class ConfigManager {
         } else {
             this.recoverSpeed = jsonConfiguration.getJson().getAsJsonObject("recover").get("recoverSpeed").getAsInt();
         }
+        if(!jsonConfiguration.getJson().getAsJsonObject("recover").has("recoverDelay")) {
+            jsonConfiguration.getJson().getAsJsonObject("recover").addProperty("recoverDelay", this.recoverDelay);
+            jsonConfiguration.saveConfig();
+
+            return false;
+        } else {
+            this.recoverDelay = jsonConfiguration.getJson().getAsJsonObject("recover").get("recoverDelay").getAsInt();
+        }
         if(!jsonConfiguration.getJson().getAsJsonObject("recover").has("blockRecoverSound")) {
             jsonConfiguration.getJson().getAsJsonObject("recover").addProperty("blockRecoverSound", this.blockRecoverSound.name());
             jsonConfiguration.saveConfig();
@@ -181,6 +190,10 @@ public class ConfigManager {
 
     public int getRecoverSpeed() {
         return recoverSpeed;
+    }
+
+    public int getRecoverDelay() {
+        return recoverDelay;
     }
 
     public Sound getBlockRecoverSound() {

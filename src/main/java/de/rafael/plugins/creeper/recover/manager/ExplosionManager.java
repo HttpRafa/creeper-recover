@@ -60,7 +60,7 @@ public class ExplosionManager {
         Bukkit.getScheduler().runTaskTimerAsynchronously(CreeperRecover.getCreeperRecover(), task -> {
             recoverBlocks(explosions, false, 1);
             if (explosion.isFinished()) task.cancel();
-        }, 0, CreeperRecover.getCreeperRecover().getConfigManager().getRecoverSpeed());
+        }, CreeperRecover.getCreeperRecover().getConfigManager().getRecoverDelay(), CreeperRecover.getCreeperRecover().getConfigManager().getRecoverSpeed());
     }
 
     public int recoverBlocks(int amount) {
