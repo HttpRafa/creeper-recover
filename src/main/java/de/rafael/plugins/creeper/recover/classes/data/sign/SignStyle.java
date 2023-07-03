@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package de.rafael.plugins.creeper.recover.classes.data;
+package de.rafael.plugins.creeper.recover.classes.data.sign;
 
 //------------------------------
 //
@@ -38,18 +38,21 @@ package de.rafael.plugins.creeper.recover.classes.data;
 //
 //------------------------------
 
+import de.rafael.plugins.creeper.recover.classes.data.IBlockData;
 import org.bukkit.DyeColor;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
+import org.bukkit.block.sign.SignSide;
 
-public record SignStyle(DyeColor dyeColor, boolean glowing, boolean editable) implements IBlockData {
+public record SignStyle(Side side, DyeColor dyeColor, boolean glowing) implements IBlockData {
 
     @Override
     public void apply(Block block, RecoverPhase phase) {
         if (phase == RecoverPhase.POST_STATE_UPDATE && block.getState() instanceof Sign sign) {
-            sign.setColor(dyeColor);
-            sign.setGlowingText(glowing);
-            sign.setEditable(editable);
+            SignSide signSide = sign.getSide(side);
+            signSide.setColor(dyeColor);
+            signSide.setGlowingText(glowing);
             sign.update(true, false);
         }
     }

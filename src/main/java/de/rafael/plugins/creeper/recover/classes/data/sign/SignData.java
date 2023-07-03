@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. All rights reserved.
+ * Copyright (c) 2023. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,27 +28,23 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package de.rafael.plugins.creeper.recover.classes.data;
+package de.rafael.plugins.creeper.recover.classes.data.sign;
 
-//------------------------------
-//
-// This class was developed by Rafael K.
-// On 07/12/2022 at 9:47 PM
-// In the project CreeperRecover
-//
-//------------------------------
-
+import de.rafael.plugins.creeper.recover.classes.data.IBlockData;
 import org.bukkit.block.Block;
 import org.bukkit.block.Sign;
 
-public record SignLines(String[] lines) implements IBlockData {
+/**
+ * @author Rafael K.
+ * @since 03/07/2023
+ */
+
+public record SignData(boolean waxed) implements IBlockData {
 
     @Override
     public void apply(Block block, RecoverPhase phase) {
-        if(phase == RecoverPhase.POST_STATE_UPDATE && block.getState() instanceof Sign sign) {
-            for (int i = 0; i < lines.length; i++) {
-                sign.setLine(i, lines[i]);
-            }
+        if (phase == RecoverPhase.POST_STATE_UPDATE && block.getState() instanceof Sign sign) {
+            sign.setWaxed(waxed);
             sign.update(true, false);
         }
     }

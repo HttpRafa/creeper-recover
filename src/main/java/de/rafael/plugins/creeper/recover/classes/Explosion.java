@@ -40,8 +40,9 @@ package de.rafael.plugins.creeper.recover.classes;
 
 import de.rafael.plugins.creeper.recover.CreeperRecover;
 import de.rafael.plugins.creeper.recover.classes.data.InventoryItems;
-import de.rafael.plugins.creeper.recover.classes.data.SignLines;
-import de.rafael.plugins.creeper.recover.classes.data.SignStyle;
+import de.rafael.plugins.creeper.recover.classes.data.sign.SignData;
+import de.rafael.plugins.creeper.recover.classes.data.sign.SignLines;
+import de.rafael.plugins.creeper.recover.classes.data.sign.SignStyle;
 import de.rafael.plugins.creeper.recover.utils.MathUtils;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -49,6 +50,8 @@ import org.bukkit.block.Block;
 import org.bukkit.block.Chest;
 import org.bukkit.block.DoubleChest;
 import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
+import org.bukkit.block.sign.SignSide;
 import org.bukkit.entity.EntityType;
 import org.bukkit.entity.TNTPrimed;
 import org.bukkit.inventory.DoubleChestInventory;
@@ -106,8 +109,12 @@ public class Explosion {
                 }
             }
             if(block.getState() instanceof Sign sign) {
-                explodedBlock.addData(new SignLines(sign.getLines()));
-                explodedBlock.addData(new SignStyle(sign.getColor(), sign.isGlowingText(), sign.isEditable()));
+                for (Side side : Side.values()) {
+                    SignSide signSide = sign.getSide(side);
+                    explodedBlock.addData(new SignLines(side, signSide.getLines()));
+                    explodedBlock.addData(new SignStyle(side, signSide.getColor(), signSide.isGlowingText()));
+                }
+                explodedBlock.addData(new SignData(sign.isWaxed()));
             }
             this.blocks.add(explodedBlock);
         }

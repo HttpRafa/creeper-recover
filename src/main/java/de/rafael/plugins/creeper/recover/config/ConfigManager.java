@@ -240,10 +240,6 @@ public class ConfigManager {
         return bStats;
     }
 
-    public List<JsonObject> getTargetList() {
-        return targetList;
-    }
-
     public boolean usePlugin(EntityExplodeEvent event) {
         boolean usePlugin = true;
 
@@ -275,7 +271,9 @@ public class ConfigManager {
                     entityTypes.add(EntityType.valueOf(types.getAsString()));
                 }
 
-                usePlugin = entityTypes.contains(event.getEntity().getType());
+                if(!entityTypes.contains(event.getEntity().getType())) {
+                    usePlugin = false;
+                }
             }
         }
 
