@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022. All rights reserved.
+ * Copyright (c) 2022-2023. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package de.rafael.plugins.creeper.recover.config;
+package de.rafael.plugins.creeper.recover.manager;
 
 //------------------------------
 //
@@ -40,9 +40,9 @@ package de.rafael.plugins.creeper.recover.config;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import de.rafael.plugins.creeper.recover.config.lib.JsonConfiguration;
+import de.rafael.plugins.creeper.recover.utils.config.JsonConfiguration;
 import de.rafael.plugins.creeper.recover.CreeperRecover;
-import de.rafael.plugins.creeper.recover.config.enums.TargetTypes;
+import de.rafael.plugins.creeper.recover.classes.enums.TargetTypes;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -51,7 +51,6 @@ import org.bukkit.entity.EntityType;
 import org.bukkit.event.entity.EntityExplodeEvent;
 
 import java.io.File;
-import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
@@ -366,7 +365,7 @@ public class ConfigManager {
         }
 
         if(success) {
-            Bukkit.getConsoleSender().sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§7Config updated from version §b" + from + " §7to §3" + to + "§8.");
+            Bukkit.getConsoleSender().sendMessage(CreeperRecover.getCreeperRecover().getMessageManager().getMessage(MessageManager.Message.PREFIX) + "§7Config updated from version §b" + from + " §7to §3" + to + "§8.");
         }
 
     }
