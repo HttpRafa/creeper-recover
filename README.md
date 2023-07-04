@@ -11,20 +11,27 @@ Recovers all destroyed blocks by Creeper or other Entities
 # Config
 ```
 {
-  "configVersion": 1,
+  "configVersion": 2,
   "plugin": {
     "bStats": true,
     "ignoreUpdates": false
   },
   "recover": {
     "recoverSpeed": 3,
-    "blockRecoverSound": "BLOCK_GRAVEL_PLACE"
+    "recoverDelay": 100,
+    "blockRecoverSound": "BLOCK_ROOTED_DIRT_PLACE",
+    "blockBlacklist": []
   },
   "target": [
     {
+      "type": "WORLD",
+      "ignore": true,
+      "whitelist": [],
+      "blacklist": []
+    },
+    {
       "type": "ENTITY",
-      "ignore": false,
-      "all": true,
+      "ignore": true,
       "entityTypes": [
         "CREEPER",
         "PRIMED_TNT"
@@ -32,7 +39,7 @@ Recovers all destroyed blocks by Creeper or other Entities
     },
     {
       "type": "HEIGHT_RANGE",
-      "ignore": false,
+      "ignore": true,
       "from": -64,
       "to": 320
     },
@@ -50,7 +57,9 @@ configVersion: Is set to the current config version.
 bStats: Whether bStats is enabled or disabled. To support me please leave it active.
 ignoreUpdates: If you don't want to receive a message in the console when the plugin has a update.
 recoverSpeed: The amount of ticks between each block that is being recovered.
+recoverDelay: The amount of ticks to wait before starting the recovery
 blockRecoverSound: Is the sound played when the plugin places a block.
+blockBlacklist: Blocks in this list are ignored by the plugin. 
 target: In the list, rules are specified where the plugin should take effect.
 
 all: If "all" is set to true all entities will be affected. So if you want only TNT to be recovered then set "all" to false and define TNT in the entityTypes setting.
@@ -67,15 +76,18 @@ DRAGON_FIREBALL
 ```
 
 # Config Examples[target]
-### Effect all entities
+### Affect only some worlds
+#### Whitelist: Only affect certain worlds
+#### Blacklist: Affect all world except those in the blacklist
 ```
 {
-      "type": "ENTITY",
+      "type": "WORLD",
       "ignore": false,
-      "all": true
+      "whitelist": [],
+      "blacklist": []
 }
 ```
-### Effect only TnT and Creepers
+### Affect only TnT and Creepers
 ```
 {
       "type": "ENTITY",
@@ -87,7 +99,7 @@ DRAGON_FIREBALL
 }
 ```
 
-### Effect only from Y-0 to Y-320
+### Affect only from Y-0 to Y-320
 ```
 {
       "type": "HEIGHT_RANGE",
@@ -97,7 +109,7 @@ DRAGON_FIREBALL
 }
 ```
 
-### Effect only at Y-60
+### Affect only at Y-60
 ```
 {
       "type": "HEIGHT_FIXED",
@@ -106,6 +118,7 @@ DRAGON_FIREBALL
 }
 ```
 
-# Download
-#### SpigotMC: https://www.spigotmc.org/resources/creeper-recover.98836/.
-#### DeinPlugin: https://deinplugin.net/storage/c97b3869-d8ec-4177-8d8c-b7792c96eedc
+# Pages
+#### [Modrinth](https://modrinth.com/plugin/creeper-recover)
+#### [SpigotMC](https://www.spigotmc.org/resources/creeper-recover.98836/)
+#### [DeinPlugin](https://deinplugin.net/storage/c97b3869-d8ec-4177-8d8c-b7792c96eedc)
