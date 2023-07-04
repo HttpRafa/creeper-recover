@@ -39,7 +39,7 @@ package de.rafael.plugins.creeper.recover.stats;
 //------------------------------
 
 import com.google.gson.JsonObject;
-import de.rafael.plugins.creeper.recover.config.lib.JsonConfiguration;
+import de.rafael.plugins.creeper.recover.utils.config.JsonConfiguration;
 
 import java.io.File;
 

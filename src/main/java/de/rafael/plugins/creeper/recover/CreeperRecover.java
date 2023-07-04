@@ -40,13 +40,14 @@ package de.rafael.plugins.creeper.recover;
 
 import de.rafael.plugins.creeper.recover.command.RecoverCommand;
 import de.rafael.plugins.creeper.recover.command.tab.RecoverCommandTabCompleter;
-import de.rafael.plugins.creeper.recover.config.ConfigManager;
+import de.rafael.plugins.creeper.recover.manager.ConfigManager;
 import de.rafael.plugins.creeper.recover.listener.BlockPhysicsListener;
 import de.rafael.plugins.creeper.recover.listener.EntityExplodeListener;
 import de.rafael.plugins.creeper.recover.manager.ExplosionManager;
+import de.rafael.plugins.creeper.recover.manager.MessageManager;
 import de.rafael.plugins.creeper.recover.stats.PluginStats;
-import de.rafael.plugins.creeper.recover.update.PluginVersion;
-import de.rafael.plugins.creeper.recover.update.UpdateChecker;
+import de.rafael.plugins.creeper.recover.utils.version.PluginVersion;
+import de.rafael.plugins.creeper.recover.utils.version.UpdateChecker;
 import org.bstats.bukkit.Metrics;
 import org.bstats.charts.SingleLineChart;
 import org.bukkit.Bukkit;
@@ -59,10 +60,9 @@ public class CreeperRecover extends JavaPlugin {
     private static CreeperRecover creeperRecover;
     private static PluginVersion version;
 
-    private final String prefix = "§8➜ §3C§breeperRecover §8● §7";
-
     private ExplosionManager explosionManager;
     private ConfigManager configManager;
+    private MessageManager messageManager;
     private PluginStats pluginStats;
 
     private UpdateChecker updateChecker;
@@ -75,8 +75,10 @@ public class CreeperRecover extends JavaPlugin {
     public void onLoad() {
         creeperRecover = this;
         version = new PluginVersion().from(getDescription().getVersion());
+        this.messageManager = new MessageManager();
+        this.messageManager.load();
 
-        Bukkit.getConsoleSender().sendMessage(prefix + "§7Loading §b" + getDescription().getName() + " §7version §3" + version.toString());
+        Bukkit.getConsoleSender().sendMessage(messageManager.getMessage(MessageManager.Message.PREFIX) + "§7Loading §b" + getDescription().getName() + " §7version §3" + version.toString());
 
         this.configManager = new ConfigManager();
         this.pluginStats = new PluginStats();
@@ -86,13 +88,13 @@ public class CreeperRecover extends JavaPlugin {
         while (!configManager.load()) {
             amount++;
         }
-        Bukkit.getConsoleSender().sendMessage(prefix + "§7The config §aloaded §7in §b" + amount + " §7cycles§8.");
+        Bukkit.getConsoleSender().sendMessage(messageManager.getMessage(MessageManager.Message.PREFIX) + "§7The config §aloaded §7in §b" + amount + " §7cycles§8.");
     }
 
     @Override
     public void onDisable() {
         int recovered = this.getExplosionManager().recoverBlocks(Integer.MAX_VALUE);
-        Bukkit.getConsoleSender().sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§7The plugin recovered §b" + recovered + " §7blocks before the server §cstops§8.");
+        Bukkit.getConsoleSender().sendMessage(messageManager.getMessage(MessageManager.Message.PREFIX) + "§7The plugin recovered §b" + recovered + " §7blocks before the server §cstops§8.");
 
         this.pluginStats.save();
     }
@@ -114,16 +116,16 @@ public class CreeperRecover extends JavaPlugin {
         if(!this.configManager.isIgnoreUpdates()) {
             this.updateChecker.isLatestVersion(version, aBoolean -> {
                 if (!aBoolean) {
-                    Bukkit.getConsoleSender().sendMessage(prefix + "§8--------------------------------------");
-                    Bukkit.getConsoleSender().sendMessage(prefix + " ");
-                    Bukkit.getConsoleSender().sendMessage(prefix + "§7The plugin §bCreeperRecover §7has an §aupdate§8.");
-                    Bukkit.getConsoleSender().sendMessage(prefix + "§7Current Version§8: §3" + getDescription().getVersion() + " §7Latest Version§8: §a" + this.updateChecker.getLatestVersion());
-                    Bukkit.getConsoleSender().sendMessage(prefix + " ");
-                    Bukkit.getConsoleSender().sendMessage(prefix + "§cThe older version may contain bugs that could lead to item loss§8.");
-                    Bukkit.getConsoleSender().sendMessage(prefix + " ");
-                    Bukkit.getConsoleSender().sendMessage(prefix + "§8--------------------------------------");
+                    Bukkit.getConsoleSender().sendMessage(messageManager.getMessage(MessageManager.Message.PREFIX) + "§8--------------------------------------");
+                    Bukkit.getConsoleSender().sendMessage(messageManager.getMessage(MessageManager.Message.PREFIX) + " ");
+                    Bukkit.getConsoleSender().sendMessage(messageManager.getMessage(MessageManager.Message.PREFIX) + "§7The plugin §bCreeperRecover §7has an §aupdate§8.");
+                    Bukkit.getConsoleSender().sendMessage(messageManager.getMessage(MessageManager.Message.PREFIX) + "§7Current Version§8: §3" + getDescription().getVersion() + " §7Latest Version§8: §a" + this.updateChecker.getLatestVersion());
+                    Bukkit.getConsoleSender().sendMessage(messageManager.getMessage(MessageManager.Message.PREFIX) + " ");
+                    Bukkit.getConsoleSender().sendMessage(messageManager.getMessage(MessageManager.Message.PREFIX) + "§cThe older version may contain bugs that could lead to item loss§8.");
+                    Bukkit.getConsoleSender().sendMessage(messageManager.getMessage(MessageManager.Message.PREFIX) + " ");
+                    Bukkit.getConsoleSender().sendMessage(messageManager.getMessage(MessageManager.Message.PREFIX) + "§8--------------------------------------");
                 } else {
-                    Bukkit.getConsoleSender().sendMessage(prefix + "§7The §bCreeperRecover §7plugin is §aup to date§8.");
+                    Bukkit.getConsoleSender().sendMessage(messageManager.getMessage(MessageManager.Message.PREFIX) + "§7The §bCreeperRecover §7plugin is §aup to date§8.");
                 }
             });
         }
@@ -140,16 +142,16 @@ public class CreeperRecover extends JavaPlugin {
         Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> this.pluginStats.tick(), 0, 20 * 60 * 5);
     }
 
-    public String getPrefix() {
-        return prefix;
-    }
-
     public ExplosionManager getExplosionManager() {
         return explosionManager;
     }
 
     public ConfigManager getConfigManager() {
         return configManager;
+    }
+
+    public MessageManager getMessageManager() {
+        return messageManager;
     }
 
     public PluginStats getPluginStats() {

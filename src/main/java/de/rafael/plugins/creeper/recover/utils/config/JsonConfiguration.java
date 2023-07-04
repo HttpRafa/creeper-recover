@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package de.rafael.plugins.creeper.recover.config.lib;
+package de.rafael.plugins.creeper.recover.utils.config;
 
 //------------------------------
 //

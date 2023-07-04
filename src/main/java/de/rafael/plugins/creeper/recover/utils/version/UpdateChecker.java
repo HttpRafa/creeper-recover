@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package de.rafael.plugins.creeper.recover.update;
+package de.rafael.plugins.creeper.recover.utils.version;
 
 //------------------------------
 //
@@ -39,6 +39,7 @@ package de.rafael.plugins.creeper.recover.update;
 //------------------------------
 
 import de.rafael.plugins.creeper.recover.CreeperRecover;
+import de.rafael.plugins.creeper.recover.manager.MessageManager;
 import org.bukkit.Bukkit;
 
 import java.io.IOException;
@@ -82,8 +83,8 @@ public class UpdateChecker {
             } else if (this.latestVersion.compare(currentVersion) < 0) {
                 this.uptoDate = false;
                 consumer.accept(false);
-            } else if (this.latestVersion.compare(currentVersion) < 1) {
-                Bukkit.getConsoleSender().sendMessage(CreeperRecover.getCreeperRecover().getPrefix() + "§7You are currently using a §bdeveloper §7version§8.");
+            } else {
+                Bukkit.getConsoleSender().sendMessage(CreeperRecover.getCreeperRecover().getMessageManager().getMessage(MessageManager.Message.PREFIX) + "§7You are currently using a §bdeveloper §7version§8.");
                 this.uptoDate = true;
                 consumer.accept(true);
             }
