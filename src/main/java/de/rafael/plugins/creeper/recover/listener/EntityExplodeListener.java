@@ -43,18 +43,16 @@ import de.rafael.plugins.creeper.recover.classes.Explosion;
 import de.rafael.plugins.creeper.recover.classes.list.BlockList;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
-import org.bukkit.block.HangingSign;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityExplodeEvent;
-
-import java.util.ArrayList;
-import java.util.List;
 
 public class EntityExplodeListener implements Listener {
 
     @EventHandler
     public void on(EntityExplodeEvent event) {
+        if (!CreeperRecover.getCreeperRecover().getConfigManager().isEnabled()) return;
+
         if (CreeperRecover.getCreeperRecover().getConfigManager().usePlugin(event)) {
             var blocks = new BlockList(event.blockList());
 

@@ -45,6 +45,7 @@ public class MessageManager {
     private final HashMap<Message, String> messages = new HashMap<>();
 
     public void load() {
+        this.messages.clear();
 
         JsonConfiguration jsonConfiguration = JsonConfiguration.loadConfig(new File("plugins//CreeperRecover/"), "messages.json");
 
@@ -70,11 +71,13 @@ public class MessageManager {
         PREFIX("prefix", "§8➜ §3C§breeperRecover §8● §7"),
         NO_PERMISSION("no.permission", "§cYou don't have permission to use this command§8."),
         BLOCKS_RECOVERED("blocks.recovered", "§b%d §7blocks recovered§8."),
+        RELOADED("reloaded", "§7Configuration was §breloaded§8."),
         STATS_TITLE("stats.title", "§7Daily§8:"),
         STATS_LINE_BLOCKS("stats.line.blocks", "   §bBlocks recovered §8» §7%d"),
         STATS_LINE_EXPLOSIONS("stats.line.explosions", "   §bExplosions recovered §8» §7%d"),
         HELP_LINE_1("help.line.1", "§8/§7recover §bfix §8[§3blocks§8/§3all§8]"),
-        HELP_LINE_2("help.line.2", "§8/§7recover §bstats");
+        HELP_LINE_2("help.line.2", "§8/§7recover §breload"),
+        HELP_LINE_3("help.line.3", "§8/§7recover §bstats");
 
         private final String id;
         private final String defaultMessage;

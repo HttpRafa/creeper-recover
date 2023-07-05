@@ -40,9 +40,9 @@ package de.rafael.plugins.creeper.recover.manager;
 
 import com.google.gson.*;
 import com.google.gson.reflect.TypeToken;
-import de.rafael.plugins.creeper.recover.utils.config.JsonConfiguration;
 import de.rafael.plugins.creeper.recover.CreeperRecover;
 import de.rafael.plugins.creeper.recover.classes.enums.TargetTypes;
+import de.rafael.plugins.creeper.recover.utils.config.JsonConfiguration;
 import org.bukkit.Bukkit;
 import org.bukkit.Location;
 import org.bukkit.Material;
@@ -65,14 +65,17 @@ public class ConfigManager {
     private int recoverDelay = 20 * 5;
 
     private Sound blockRecoverSound;
-    private List<Material> blockBlacklist = new ArrayList<>();
+    private List<Material> blockBlacklist;
 
+    private boolean enabled = true;
     private boolean bStats = true;
     private boolean ignoreUpdates = false;
 
     private List<JsonObject> targetList;
 
     public boolean load() {
+
+        this.blockBlacklist = new ArrayList<>();
 
         try {
             this.blockRecoverSound = Sound.valueOf("BLOCK_ROOTED_DIRT_PLACE");
@@ -96,15 +99,23 @@ public class ConfigManager {
             }
         }
 
-        if(!jsonConfiguration.getJson().has("plugin")) {
+        if (!jsonConfiguration.getJson().has("plugin")) {
             jsonConfiguration.getJson().add("plugin", new JsonObject());
         }
-        if(!jsonConfiguration.getJson().has("recover")) {
+        if (!jsonConfiguration.getJson().has("recover")) {
             jsonConfiguration.getJson().add("recover", new JsonObject());
         }
 
         // Plugin
-        if(!jsonConfiguration.getJson().getAsJsonObject("plugin").has("bStats")) {
+        if (!jsonConfiguration.getJson().getAsJsonObject("plugin").has("enabled")) {
+            jsonConfiguration.getJson().getAsJsonObject("plugin").addProperty("enabled", this.enabled);
+            jsonConfiguration.saveConfig();
+
+            return false;
+        } else {
+            this.enabled = jsonConfiguration.getJson().getAsJsonObject("plugin").get("enabled").getAsBoolean();
+        }
+        if (!jsonConfiguration.getJson().getAsJsonObject("plugin").has("bStats")) {
             jsonConfiguration.getJson().getAsJsonObject("plugin").addProperty("bStats", this.bStats);
             jsonConfiguration.saveConfig();
 
@@ -112,7 +123,7 @@ public class ConfigManager {
         } else {
             this.bStats = jsonConfiguration.getJson().getAsJsonObject("plugin").get("bStats").getAsBoolean();
         }
-        if(!jsonConfiguration.getJson().getAsJsonObject("plugin").has("ignoreUpdates")) {
+        if (!jsonConfiguration.getJson().getAsJsonObject("plugin").has("ignoreUpdates")) {
             jsonConfiguration.getJson().getAsJsonObject("plugin").addProperty("ignoreUpdates", this.ignoreUpdates);
             jsonConfiguration.saveConfig();
 
@@ -229,6 +240,10 @@ public class ConfigManager {
 
     public List<Material> getBlockBlacklist() {
         return blockBlacklist;
+    }
+
+    public boolean isEnabled() {
+        return enabled;
     }
 
     public boolean isIgnoreUpdates() {

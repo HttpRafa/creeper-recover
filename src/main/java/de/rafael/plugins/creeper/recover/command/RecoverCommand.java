@@ -69,6 +69,10 @@ public class RecoverCommand implements CommandExecutor {
             } catch (NumberFormatException exception) {
                 sender.sendMessage(messageManager.getMessage(MessageManager.Message.PREFIX) + "§c" + exception.getMessage());
             }
+        } else if (args.length == 1 && args[0].equalsIgnoreCase("reload")) {
+            CreeperRecover.getCreeperRecover().getConfigManager().load();
+            CreeperRecover.getCreeperRecover().getMessageManager().load();
+            sender.sendMessage(messageManager.getMessage(MessageManager.Message.PREFIX) + messageManager.getMessage(MessageManager.Message.RELOADED));
         } else if (args.length == 1 && args[0].equalsIgnoreCase("stats")) {
             sender.sendMessage(messageManager.getMessage(MessageManager.Message.PREFIX) + messageManager.getMessage(MessageManager.Message.STATS_TITLE));
             sender.sendMessage(messageManager.getMessage(MessageManager.Message.PREFIX) + messageManager.getMessage(MessageManager.Message.STATS_LINE_BLOCKS, CreeperRecover.getCreeperRecover().getPluginStats().getBlocksRecovered()));
@@ -82,6 +86,7 @@ public class RecoverCommand implements CommandExecutor {
     public void showHelp(CommandSender sender) {
         sender.sendMessage(CreeperRecover.getCreeperRecover().getMessageManager().getMessage(MessageManager.Message.PREFIX) + CreeperRecover.getCreeperRecover().getMessageManager().getMessage(MessageManager.Message.HELP_LINE_1));
         sender.sendMessage(CreeperRecover.getCreeperRecover().getMessageManager().getMessage(MessageManager.Message.PREFIX) + CreeperRecover.getCreeperRecover().getMessageManager().getMessage(MessageManager.Message.HELP_LINE_2));
+        sender.sendMessage(CreeperRecover.getCreeperRecover().getMessageManager().getMessage(MessageManager.Message.PREFIX) + CreeperRecover.getCreeperRecover().getMessageManager().getMessage(MessageManager.Message.HELP_LINE_3));
     }
 
 }
