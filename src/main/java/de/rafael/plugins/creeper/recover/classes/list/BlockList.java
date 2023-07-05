@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2022-2023. All rights reserved.
+ * Copyright (c) 2023. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,48 +28,41 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package de.rafael.plugins.creeper.recover.listener;
+package de.rafael.plugins.creeper.recover.classes.list;
 
-//------------------------------
-//
-// This class was developed by Rafael K.
-// On 31.12.2021 at 12:37
-// In the project CreeperRecover
-//
-//------------------------------
-
-import de.rafael.plugins.creeper.recover.CreeperRecover;
-import de.rafael.plugins.creeper.recover.classes.Explosion;
-import de.rafael.plugins.creeper.recover.classes.list.BlockList;
-import org.bukkit.Material;
+import de.rafael.plugins.creeper.recover.classes.interfaces.TripleConsumer;
 import org.bukkit.block.Block;
-import org.bukkit.block.HangingSign;
-import org.bukkit.event.EventHandler;
-import org.bukkit.event.Listener;
-import org.bukkit.event.entity.EntityExplodeEvent;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-public class EntityExplodeListener implements Listener {
+public record BlockList(List<Block> blocks) {
 
-    @EventHandler
-    public void on(EntityExplodeEvent event) {
-        if (CreeperRecover.getCreeperRecover().getConfigManager().usePlugin(event)) {
-            var blocks = new BlockList(event.blockList());
+    public void forEach(TripleConsumer<Block, Consumer<Block>, Consumer<Block>> each) {
+        var listCopy = new ArrayList<>(blocks);
+        var ignored = new ArrayList<>();
+        listCopy.forEach(block -> {
+            if (!ignored.contains(block)) {
+                each.accept(block, ignored::add, this::addIfNotFound);
+            }
+        });
+    }
 
-            // Disable damage by explosion
-            event.setYield(100);
-            blocks.removeIf(block -> CreeperRecover.getCreeperRecover().getConfigManager().getBlockBlacklist().contains(block.getType()));
-
-            // Store blocks
-            CreeperRecover.getCreeperRecover().getExplosionManager().handle(new Explosion(event.getLocation().clone(), blocks));
-
-            // Remove all blocks without collision. To prevent redstone and other blocks from being without support blocks.
-            blocks.stream().filter(Block::isPassable).forEach(block -> block.setType(Material.AIR, false));
-            // Remove the rest of the blocks
-            blocks.stream().filter(block -> !block.isPassable()).forEach(block -> block.setType(Material.AIR, false));
+    public void addIfNotFound(Block block) {
+        if (!blocks.contains(block)) {
+            blocks.add(block);
         }
+    }
+
+    public void removeIf(Predicate<Block> filter) {
+        this.blocks.removeIf(filter);
+    }
+
+    public Stream<Block> stream() {
+        return this.blocks.stream();
     }
 
 }
