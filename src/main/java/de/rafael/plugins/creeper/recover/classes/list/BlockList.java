@@ -31,6 +31,7 @@
 package de.rafael.plugins.creeper.recover.classes.list;
 
 import de.rafael.plugins.creeper.recover.classes.interfaces.TripleConsumer;
+import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 
 import java.util.ArrayList;
@@ -59,6 +60,7 @@ public class BlockList {
     }
 
     public void addIfNotFound(Block block) {
+        Bukkit.broadcastMessage(block.getLocation().toString());
         if(!blocks.contains(block)) {
             blocks.add(block);
         }
