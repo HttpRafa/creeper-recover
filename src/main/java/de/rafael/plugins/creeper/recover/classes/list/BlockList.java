@@ -31,7 +31,6 @@
 package de.rafael.plugins.creeper.recover.classes.list;
 
 import de.rafael.plugins.creeper.recover.classes.interfaces.TripleConsumer;
-import org.bukkit.Bukkit;
 import org.bukkit.block.Block;
 
 import java.util.ArrayList;
@@ -39,29 +38,21 @@ import java.util.List;
 import java.util.function.Consumer;
 import java.util.function.Predicate;
 import java.util.stream.Stream;
-import java.util.stream.StreamSupport;
 
-public class BlockList {
-
-    private final List<Block> blocks;
-
-    public BlockList(List<Block> blocks) {
-        this.blocks = blocks;
-    }
+public record BlockList(List<Block> blocks) {
 
     public void forEach(TripleConsumer<Block, Consumer<Block>, Consumer<Block>> each) {
         var listCopy = new ArrayList<>(blocks);
         var ignored = new ArrayList<>();
         listCopy.forEach(block -> {
-            if(!ignored.contains(block)) {
+            if (!ignored.contains(block)) {
                 each.accept(block, ignored::add, this::addIfNotFound);
             }
         });
     }
 
     public void addIfNotFound(Block block) {
-        Bukkit.broadcastMessage(block.getLocation().toString());
-        if(!blocks.contains(block)) {
+        if (!blocks.contains(block)) {
             blocks.add(block);
         }
     }
@@ -72,10 +63,6 @@ public class BlockList {
 
     public Stream<Block> stream() {
         return this.blocks.stream();
-    }
-
-    public List<Block> getBlocks() {
-        return blocks;
     }
 
 }

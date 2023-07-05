@@ -59,16 +59,17 @@ import org.bukkit.inventory.DoubleChestInventory;
 import org.bukkit.inventory.InventoryHolder;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class Explosion {
 
     private final Location location;
-    private final List<ExplodedBlock> blocks = new ArrayList<>();
+    private final List<ExplodedBlock> blocks;
 
     public Explosion(Location location, BlockList blocks) {
         this.location = location;
-        // List<Block> sortedBlocks = blocks.stream().sorted(Comparator.comparingDouble(item -> ((Block) item).getLocation().distance(location)).reversed()).toList();
 
+        List<ExplodedBlock> explodedBlocks = new ArrayList<>();
         blocks.forEach((block, ignore, add) -> {
             if (block.getType() == Material.TNT) {
                 TNTPrimed tnt = (TNTPrimed) Objects.requireNonNull(block.getLocation().getWorld()).spawnEntity(MathUtils.toCenterLocation(block.getLocation()), EntityType.PRIMED_TNT);
@@ -95,12 +96,12 @@ public class Explosion {
                     Chest rightSide = (Chest) doubleChest.getRightSide();
                     assert leftSide != null;
                     assert rightSide != null;
-                    if (block == leftSide.getBlock()) {
+                    if (block.equals(leftSide.getBlock())) {
                         add.accept(rightSide.getBlock());
                         ignore.accept(rightSide.getBlock());
                         ExplodedBlock extraChest = new ExplodedBlock(rightSide.getBlock().getLocation().clone(), rightSide.getBlock().getType(), rightSide.getBlock().getBlockData().clone());
                         explodedBlock.connectBlock(extraChest);
-                    } else if (block == rightSide.getBlock()) {
+                    } else if (block.equals(rightSide.getBlock())) {
                         add.accept(leftSide.getBlock());
                         ignore.accept(leftSide.getBlock());
                         ExplodedBlock extraChest = new ExplodedBlock(leftSide.getBlock().getLocation().clone(), leftSide.getBlock().getType(), leftSide.getBlock().getBlockData().clone());
@@ -116,8 +117,9 @@ public class Explosion {
                 }
                 explodedBlock.addData(new SignData(sign.isWaxed()));
             }
-            this.blocks.add(explodedBlock);
+            explodedBlocks.add(explodedBlock);
         });
+        this.blocks = explodedBlocks.stream().sorted(Comparator.comparingDouble(item -> ((ExplodedBlock)item).getLocation().distance(location)).reversed()).collect(Collectors.toCollection(ArrayList::new));
     }
 
     public synchronized boolean recoverBlock() {
