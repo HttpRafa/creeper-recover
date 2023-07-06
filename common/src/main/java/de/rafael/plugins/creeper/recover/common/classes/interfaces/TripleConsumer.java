@@ -28,52 +28,10 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-plugins {
-    id("java")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-}
+package de.rafael.plugins.creeper.recover.common.classes.interfaces;
 
-repositories {
-    mavenCentral()
+public interface TripleConsumer<A, B, C> {
 
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-}
+    void accept(A a, B b, C c);
 
-dependencies {
-    implementation(project(":common"))
-    implementation("org.bstats:bstats-bukkit:" + findProperty("bstats_version"))
-    implementation("org.jetbrains:annotations:" + findProperty("jetbrains_annotations_version"))
-
-    compileOnly("org.spigotmc:spigot-api:" + findProperty("spigot_version"))
-
-    compileOnly("org.projectlombok:lombok:" + findProperty("lombok_version"))
-    annotationProcessor("org.projectlombok:lombok:" + findProperty("lombok_version"))
-}
-
-tasks.jar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-}
-
-tasks.shadowJar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-
-    relocate("org.bstats", "de.rafael.plugins.creeper.recover.utils")
-}
-
-tasks.assemble {
-    dependsOn(tasks.shadowJar)
-}
-
-tasks {
-    javadoc {
-        options.encoding = "UTF-8"
-    }
-    compileJava {
-        options.encoding = "UTF-8"
-    }
-    compileTestJava {
-        options.encoding = "UTF-8"
-    }
 }

@@ -28,52 +28,27 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-plugins {
-    id("java")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-}
+package de.rafael.plugins.creeper.recover.common.listener;
 
-repositories {
-    mavenCentral()
+import de.rafael.plugins.creeper.recover.common.CreeperPlugin;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.block.BlockPhysicsEvent;
 
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-}
+/**
+ * @author Rafael K.
+ * @since 02/07/2023
+ */
 
-dependencies {
-    implementation(project(":common"))
-    implementation("org.bstats:bstats-bukkit:" + findProperty("bstats_version"))
-    implementation("org.jetbrains:annotations:" + findProperty("jetbrains_annotations_version"))
+public class BlockPhysicsListener implements Listener {
 
-    compileOnly("org.spigotmc:spigot-api:" + findProperty("spigot_version"))
+    @EventHandler
+    public void on(BlockPhysicsEvent event) {
+        if (!CreeperPlugin.instance().configManager().enabled()) return;
 
-    compileOnly("org.projectlombok:lombok:" + findProperty("lombok_version"))
-    annotationProcessor("org.projectlombok:lombok:" + findProperty("lombok_version"))
-}
-
-tasks.jar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-}
-
-tasks.shadowJar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-
-    relocate("org.bstats", "de.rafael.plugins.creeper.recover.utils")
-}
-
-tasks.assemble {
-    dependsOn(tasks.shadowJar)
-}
-
-tasks {
-    javadoc {
-        options.encoding = "UTF-8"
+        if (CreeperPlugin.instance().explosionManager().hasSuppressedBlocks() && CreeperPlugin.instance().explosionManager().isBlockSuppressed(event.getBlock().getLocation())) {
+            event.setCancelled(true);
+        }
     }
-    compileJava {
-        options.encoding = "UTF-8"
-    }
-    compileTestJava {
-        options.encoding = "UTF-8"
-    }
+
 }

@@ -28,52 +28,41 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-plugins {
-    id("java")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-}
+package de.rafael.plugins.creeper.recover.common.classes.list;
 
-repositories {
-    mavenCentral()
+import de.rafael.plugins.creeper.recover.common.classes.interfaces.TripleConsumer;
+import org.bukkit.block.Block;
 
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-}
+import java.util.ArrayList;
+import java.util.List;
+import java.util.function.Consumer;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
-dependencies {
-    implementation(project(":common"))
-    implementation("org.bstats:bstats-bukkit:" + findProperty("bstats_version"))
-    implementation("org.jetbrains:annotations:" + findProperty("jetbrains_annotations_version"))
+public record BlockList(List<Block> blocks) {
 
-    compileOnly("org.spigotmc:spigot-api:" + findProperty("spigot_version"))
-
-    compileOnly("org.projectlombok:lombok:" + findProperty("lombok_version"))
-    annotationProcessor("org.projectlombok:lombok:" + findProperty("lombok_version"))
-}
-
-tasks.jar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-}
-
-tasks.shadowJar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-
-    relocate("org.bstats", "de.rafael.plugins.creeper.recover.utils")
-}
-
-tasks.assemble {
-    dependsOn(tasks.shadowJar)
-}
-
-tasks {
-    javadoc {
-        options.encoding = "UTF-8"
+    public void forEach(TripleConsumer<Block, Consumer<Block>, Consumer<Block>> each) {
+        var listCopy = new ArrayList<>(blocks);
+        var ignored = new ArrayList<>();
+        listCopy.forEach(block -> {
+            if (!ignored.contains(block)) {
+                each.accept(block, ignored::add, this::addIfNotFound);
+            }
+        });
     }
-    compileJava {
-        options.encoding = "UTF-8"
+
+    public void addIfNotFound(Block block) {
+        if (!blocks.contains(block)) {
+            blocks.add(block);
+        }
     }
-    compileTestJava {
-        options.encoding = "UTF-8"
+
+    public void removeIf(Predicate<Block> filter) {
+        this.blocks.removeIf(filter);
     }
+
+    public Stream<Block> stream() {
+        return this.blocks.stream();
+    }
+
 }

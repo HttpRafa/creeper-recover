@@ -28,52 +28,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-plugins {
-    id("java")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-}
+package de.rafael.plugins.creeper.recover.common.classes.data.sign;
 
-repositories {
-    mavenCentral()
+import de.rafael.plugins.creeper.recover.common.classes.data.IBlockData;
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
 
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-}
+/**
+ * @author Rafael K.
+ * @since 03/07/2023
+ */
 
-dependencies {
-    implementation(project(":common"))
-    implementation("org.bstats:bstats-bukkit:" + findProperty("bstats_version"))
-    implementation("org.jetbrains:annotations:" + findProperty("jetbrains_annotations_version"))
+public record SignData(boolean waxed) implements IBlockData {
 
-    compileOnly("org.spigotmc:spigot-api:" + findProperty("spigot_version"))
-
-    compileOnly("org.projectlombok:lombok:" + findProperty("lombok_version"))
-    annotationProcessor("org.projectlombok:lombok:" + findProperty("lombok_version"))
-}
-
-tasks.jar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-}
-
-tasks.shadowJar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-
-    relocate("org.bstats", "de.rafael.plugins.creeper.recover.utils")
-}
-
-tasks.assemble {
-    dependsOn(tasks.shadowJar)
-}
-
-tasks {
-    javadoc {
-        options.encoding = "UTF-8"
+    @Override
+    public void apply(Block block, RecoverPhase phase) {
+        if (phase == RecoverPhase.POST_STATE_UPDATE && block.getState() instanceof Sign sign) {
+            sign.setWaxed(waxed);
+            sign.update(true, false);
+        }
     }
-    compileJava {
-        options.encoding = "UTF-8"
-    }
-    compileTestJava {
-        options.encoding = "UTF-8"
-    }
+
 }

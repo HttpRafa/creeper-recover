@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. All rights reserved.
+ * Copyright (c) 2022-2023. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,52 +28,25 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-plugins {
-    id("java")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-}
+package de.rafael.plugins.creeper.recover.common.classes.data;
 
-repositories {
-    mavenCentral()
+//------------------------------
+//
+// This class was developed by Rafael K.
+// On 07/12/2022 at 9:43 PM
+// In the project CreeperRecover
+//
+//------------------------------
 
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-}
+import org.bukkit.block.Block;
 
-dependencies {
-    implementation(project(":common"))
-    implementation("org.bstats:bstats-bukkit:" + findProperty("bstats_version"))
-    implementation("org.jetbrains:annotations:" + findProperty("jetbrains_annotations_version"))
+public interface IBlockData {
 
-    compileOnly("org.spigotmc:spigot-api:" + findProperty("spigot_version"))
+    void apply(Block block, RecoverPhase phase);
 
-    compileOnly("org.projectlombok:lombok:" + findProperty("lombok_version"))
-    annotationProcessor("org.projectlombok:lombok:" + findProperty("lombok_version"))
-}
-
-tasks.jar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-}
-
-tasks.shadowJar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-
-    relocate("org.bstats", "de.rafael.plugins.creeper.recover.utils")
-}
-
-tasks.assemble {
-    dependsOn(tasks.shadowJar)
-}
-
-tasks {
-    javadoc {
-        options.encoding = "UTF-8"
+    enum RecoverPhase {
+        PRE_STATE_UPDATE,
+        POST_STATE_UPDATE
     }
-    compileJava {
-        options.encoding = "UTF-8"
-    }
-    compileTestJava {
-        options.encoding = "UTF-8"
-    }
+
 }

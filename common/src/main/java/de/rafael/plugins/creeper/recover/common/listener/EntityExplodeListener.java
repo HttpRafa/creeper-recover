@@ -28,7 +28,7 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-package de.rafael.plugins.creeper.recover;
+package de.rafael.plugins.creeper.recover.common.listener;
 
 //------------------------------
 //
@@ -39,29 +39,35 @@ package de.rafael.plugins.creeper.recover;
 //------------------------------
 
 import de.rafael.plugins.creeper.recover.common.CreeperPlugin;
-import de.rafael.plugins.creeper.recover.scheduler.BukkitScheduler;
-import org.bukkit.Bukkit;
+import de.rafael.plugins.creeper.recover.common.classes.Explosion;
+import de.rafael.plugins.creeper.recover.common.classes.list.BlockList;
+import org.bukkit.Material;
+import org.bukkit.block.Block;
+import org.bukkit.event.EventHandler;
+import org.bukkit.event.Listener;
+import org.bukkit.event.entity.EntityExplodeEvent;
 
-public class CreeperRecover extends CreeperPlugin {
+public class EntityExplodeListener implements Listener {
 
-    @Override
-    public void onLoad() {
-        super.onLoad();
+    @EventHandler
+    public void on(EntityExplodeEvent event) {
+        if (!CreeperPlugin.instance().configManager().enabled()) return;
 
-        this.scheduler = new BukkitScheduler();
-    }
+        if (CreeperPlugin.instance().configManager().usePlugin(event)) {
+            var blocks = new BlockList(event.blockList());
 
-    @Override
-    public void onDisable() {
-        super.onDisable();
-    }
+            // Disable damage by explosion
+            event.setYield(100);
+            blocks.removeIf(block -> CreeperPlugin.instance().configManager().blockBlacklist().contains(block.getType()));
 
-    @Override
-    public void onEnable() {
-        super.onEnable();
+            // Store blocks
+            CreeperPlugin.instance().explosionManager().handle(new Explosion(event.getLocation().clone(), blocks));
 
-        // Tasks
-        Bukkit.getScheduler().runTaskTimerAsynchronously(this, () -> this.pluginStats.tick(), 0, 20 * 60 * 5);
+            // Remove all blocks without collision. To prevent redstone and other blocks from being without support blocks.
+            blocks.stream().filter(Block::isPassable).forEach(block -> block.setType(Material.AIR, false));
+            // Remove the rest of the blocks
+            blocks.stream().filter(block -> !block.isPassable()).forEach(block -> block.setType(Material.AIR, false));
+        }
     }
 
 }

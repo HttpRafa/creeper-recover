@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. All rights reserved.
+ * Copyright (c) 2022-2023. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,52 +28,33 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-plugins {
-    id("java")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-}
+package de.rafael.plugins.creeper.recover.common.classes.data.sign;
 
-repositories {
-    mavenCentral()
+//------------------------------
+//
+// This class was developed by Rafael K.
+// On 07/12/2022 at 10:23 PM
+// In the project CreeperRecover
+//
+//------------------------------
 
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-}
+import de.rafael.plugins.creeper.recover.common.classes.data.IBlockData;
+import org.bukkit.DyeColor;
+import org.bukkit.block.Block;
+import org.bukkit.block.Sign;
+import org.bukkit.block.sign.Side;
+import org.bukkit.block.sign.SignSide;
 
-dependencies {
-    implementation(project(":common"))
-    implementation("org.bstats:bstats-bukkit:" + findProperty("bstats_version"))
-    implementation("org.jetbrains:annotations:" + findProperty("jetbrains_annotations_version"))
+public record SignStyle(Side side, DyeColor dyeColor, boolean glowing) implements IBlockData {
 
-    compileOnly("org.spigotmc:spigot-api:" + findProperty("spigot_version"))
-
-    compileOnly("org.projectlombok:lombok:" + findProperty("lombok_version"))
-    annotationProcessor("org.projectlombok:lombok:" + findProperty("lombok_version"))
-}
-
-tasks.jar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-}
-
-tasks.shadowJar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-
-    relocate("org.bstats", "de.rafael.plugins.creeper.recover.utils")
-}
-
-tasks.assemble {
-    dependsOn(tasks.shadowJar)
-}
-
-tasks {
-    javadoc {
-        options.encoding = "UTF-8"
+    @Override
+    public void apply(Block block, RecoverPhase phase) {
+        if (phase == RecoverPhase.POST_STATE_UPDATE && block.getState() instanceof Sign sign) {
+            SignSide signSide = sign.getSide(side);
+            signSide.setColor(dyeColor);
+            signSide.setGlowingText(glowing);
+            sign.update(true, false);
+        }
     }
-    compileJava {
-        options.encoding = "UTF-8"
-    }
-    compileTestJava {
-        options.encoding = "UTF-8"
-    }
+
 }

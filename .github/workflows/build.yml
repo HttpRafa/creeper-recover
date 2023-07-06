@@ -1,0 +1,29 @@
+name: "Build CreeperRecover"
+on: [ "push" ]
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        java: [ 17 ]
+      fail-fast: true
+    steps:
+      - uses: actions/chechout@v3
+      - name: JDK ${{ matrix.java }}
+        uses: actions/setup-java@v3
+        with:
+          java-version: ${{ matrix.java }}
+          distribution: "temurin"
+      - name: Run chmod to make gradlew executable
+        run: chmod +x ./gradlew
+      - name: Build
+        uses: gradle/gradle-build-action@v2.4.2
+        with:
+          arguments: build
+      - name: Upload Jars
+        uses: actions/upload-artifact@v3
+        with:
+          name: jars
+          path: |
+            folia/build/libs/*.jar
+            spigot/build/libs/*.jar

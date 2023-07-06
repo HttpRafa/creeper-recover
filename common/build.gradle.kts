@@ -40,7 +40,6 @@ repositories {
 }
 
 dependencies {
-    implementation(project(":common"))
     implementation("org.bstats:bstats-bukkit:" + findProperty("bstats_version"))
     implementation("org.jetbrains:annotations:" + findProperty("jetbrains_annotations_version"))
 
@@ -50,15 +49,7 @@ dependencies {
     annotationProcessor("org.projectlombok:lombok:" + findProperty("lombok_version"))
 }
 
-tasks.jar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-}
-
 tasks.shadowJar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-
     relocate("org.bstats", "de.rafael.plugins.creeper.recover.utils")
 }
 

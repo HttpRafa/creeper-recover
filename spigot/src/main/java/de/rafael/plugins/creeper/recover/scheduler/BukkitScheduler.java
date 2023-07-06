@@ -28,52 +28,41 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-plugins {
-    id("java")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-}
+package de.rafael.plugins.creeper.recover.scheduler;
 
-repositories {
-    mavenCentral()
+import de.rafael.plugins.creeper.recover.CreeperRecover;
+import de.rafael.plugins.creeper.recover.common.CreeperPlugin;
+import org.bukkit.Bukkit;
+import org.bukkit.Location;
+import org.jetbrains.annotations.NotNull;
 
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-}
+import java.util.concurrent.TimeUnit;
+import java.util.function.Consumer;
 
-dependencies {
-    implementation(project(":common"))
-    implementation("org.bstats:bstats-bukkit:" + findProperty("bstats_version"))
-    implementation("org.jetbrains:annotations:" + findProperty("jetbrains_annotations_version"))
+/**
+ * @author Rafael K.
+ * @since 06/07/2023
+ */
 
-    compileOnly("org.spigotmc:spigot-api:" + findProperty("spigot_version"))
+public class BukkitScheduler implements CreeperPlugin.Scheduler {
 
-    compileOnly("org.projectlombok:lombok:" + findProperty("lombok_version"))
-    annotationProcessor("org.projectlombok:lombok:" + findProperty("lombok_version"))
-}
-
-tasks.jar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-}
-
-tasks.shadowJar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-
-    relocate("org.bstats", "de.rafael.plugins.creeper.recover.utils")
-}
-
-tasks.assemble {
-    dependsOn(tasks.shadowJar)
-}
-
-tasks {
-    javadoc {
-        options.encoding = "UTF-8"
+    @Override
+    public void runOnCorrectThread(Location location, Runnable runnable) {
+        if (Bukkit.isPrimaryThread()) {
+            runnable.run();
+        } else {
+            Bukkit.getScheduler().runTask(CreeperPlugin.instance(), runnable);
+        }
     }
-    compileJava {
-        options.encoding = "UTF-8"
+
+    @Override
+    public void runAsync(Runnable runnable) {
+        Bukkit.getScheduler().runTaskAsynchronously(CreeperRecover.instance(), runnable);
     }
-    compileTestJava {
-        options.encoding = "UTF-8"
+
+    @Override
+    public void runAsyncAtFixedRate(Consumer<Runnable> runnable, int delay, int period, @NotNull TimeUnit unit) {
+        Bukkit.getScheduler().runTaskTimerAsynchronously(CreeperPlugin.instance(), bukkitTask -> runnable.accept(bukkitTask::cancel), unit.toMillis(delay) / 50, unit.toMillis(period) / 50);
     }
+
 }

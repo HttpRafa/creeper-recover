@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. All rights reserved.
+ * Copyright (c) 2022-2023. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,52 +28,39 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-plugins {
-    id("java")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-}
+package de.rafael.plugins.creeper.recover.common.utils;
 
-repositories {
-    mavenCentral()
+//------------------------------
+//
+// This class was developed by Rafael K.
+// On 12/31/2021 at 11:37 PM
+// In the project CreeperRecover
+//
+//------------------------------
 
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-}
+import org.bukkit.Location;
+import org.bukkit.util.Vector;
 
-dependencies {
-    implementation(project(":common"))
-    implementation("org.bstats:bstats-bukkit:" + findProperty("bstats_version"))
-    implementation("org.jetbrains:annotations:" + findProperty("jetbrains_annotations_version"))
+import java.util.Random;
 
-    compileOnly("org.spigotmc:spigot-api:" + findProperty("spigot_version"))
+public class MathUtils {
 
-    compileOnly("org.projectlombok:lombok:" + findProperty("lombok_version"))
-    annotationProcessor("org.projectlombok:lombok:" + findProperty("lombok_version"))
-}
+    public static Random RANDOM = new Random();
 
-tasks.jar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-}
-
-tasks.shadowJar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-
-    relocate("org.bstats", "de.rafael.plugins.creeper.recover.utils")
-}
-
-tasks.assemble {
-    dependsOn(tasks.shadowJar)
-}
-
-tasks {
-    javadoc {
-        options.encoding = "UTF-8"
+    public static int generateRandomInteger(int minimum, int maximum) {
+        return minimum + (int) (RANDOM.nextDouble() * ((maximum - minimum) + 1));
     }
-    compileJava {
-        options.encoding = "UTF-8"
+
+    public static Vector calculateVectorBetween2Locations(Location location1, Location location2) {
+        return location2.toVector().subtract(location1.toVector());
     }
-    compileTestJava {
-        options.encoding = "UTF-8"
+
+    public static Location toCenterLocation(Location location) {
+        Location centerLoc = location.clone();
+        centerLoc.setX((double) location.getBlockX() + 0.5D);
+        centerLoc.setY((double) location.getBlockY() + 0.5D);
+        centerLoc.setZ((double) location.getBlockZ() + 0.5D);
+        return centerLoc;
     }
+
 }
