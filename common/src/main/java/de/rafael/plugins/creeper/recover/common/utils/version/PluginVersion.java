@@ -1,5 +1,5 @@
 /*
- * Copyright (c) 2023. All rights reserved.
+ * Copyright (c) 2022-2023. All rights reserved.
  *
  * Redistribution and use in source and binary forms, with or without
  * modification, are permitted provided that the following conditions are met:
@@ -28,52 +28,58 @@
  * SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
  */
 
-plugins {
-    id("java")
-    id("com.github.johnrengelman.shadow") version "8.1.1"
-}
+package de.rafael.plugins.creeper.recover.common.utils.version;
 
-repositories {
-    mavenCentral()
+//------------------------------
+//
+// This class was developed by Rafael K.
+// On 2/25/2022 at 1:47 PM
+// In the project CreeperRecover
+//
+//------------------------------
 
-    maven("https://hub.spigotmc.org/nexus/content/repositories/snapshots/")
-}
+import lombok.Getter;
+import org.jetbrains.annotations.NotNull;
 
-dependencies {
-    implementation(project(":common"))
-    implementation("org.bstats:bstats-bukkit:" + findProperty("bstats_version"))
-    implementation("org.jetbrains:annotations:" + findProperty("jetbrains_annotations_version"))
+@Getter
+public class PluginVersion {
 
-    compileOnly("org.spigotmc:spigot-api:" + findProperty("spigot_version"))
+    private int major = 1;
+    private int minor = 0;
+    private int patch = 0;
 
-    compileOnly("org.projectlombok:lombok:" + findProperty("lombok_version"))
-    annotationProcessor("org.projectlombok:lombok:" + findProperty("lombok_version"))
-}
-
-tasks.jar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-}
-
-tasks.shadowJar {
-    archiveBaseName.set(findProperty("archives_base_name").toString())
-    archiveClassifier.set(project.name)
-
-    relocate("org.bstats", "de.rafael.plugins.creeper.recover.utils")
-}
-
-tasks.assemble {
-    dependsOn(tasks.shadowJar)
-}
-
-tasks {
-    javadoc {
-        options.encoding = "UTF-8"
+    public PluginVersion(int major, int minor, int patch) {
+        this.major = major;
+        this.minor = minor;
+        this.patch = patch;
     }
-    compileJava {
-        options.encoding = "UTF-8"
+
+    public PluginVersion() {
+
     }
-    compileTestJava {
-        options.encoding = "UTF-8"
+
+    public PluginVersion from(@NotNull String version) {
+        String[] numbers = version.split("\\.");
+        this.major = Integer.parseInt(numbers[0]);
+        this.minor = Integer.parseInt(numbers[1]);
+        this.patch = Integer.parseInt(numbers[2]);
+        return this;
     }
+
+    public int compare(PluginVersion pluginVersion) {
+        return Integer.compare(pluginVersion.asInt(), this.asInt());
+    }
+
+    public int asInt() {
+        int value = this.major;
+        value = (value << 8) + this.minor;
+        value = (value << 8) + this.patch;
+        return value;
+    }
+
+    @Override
+    public String toString() {
+        return major + "." + minor + "." + patch;
+    }
+
 }

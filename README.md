@@ -56,8 +56,8 @@ Recovers all destroyed blocks by Creeper or other Entities
 configVersion: Is set to the current config version.
 bStats: Whether bStats is enabled or disabled. To support me please leave it active.
 ignoreUpdates: If you don't want to receive a message in the console when the plugin has a update.
-recoverSpeed: The amount of ticks between each block that is being recovered.
-recoverDelay: The amount of ticks to wait before starting the recovery
+recoverSpeed: The time in milliseconds between each block that is being recovered.
+recoverDelay: The time in milliseconds to wait before starting the recovery
 blockRecoverSound: Is the sound played when the plugin places a block.
 blockBlacklist: Blocks in this list are ignored by the plugin. 
 target: In the list, rules are specified where the plugin should take effect.
