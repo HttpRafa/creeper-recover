@@ -191,7 +191,7 @@ public class ConfigManager {
 
                 JsonArray entityTypes = new JsonArray();
                 entityTypes.add(EntityType.CREEPER.name());
-                entityTypes.add(EntityType.PRIMED_TNT.name());
+                entityTypes.add(EntityType.TNT.name());
 
                 entityTarget.add("entityTypes", entityTypes);
                 jsonArray.add(entityTarget);

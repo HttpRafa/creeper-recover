@@ -1,7 +1,7 @@
 # Project exclude paths
-/build/
-/.idea/
-/.gradle/
+build/
+.idea/
+.gradle/
 
 # Files
 *.iml

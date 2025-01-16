@@ -74,7 +74,7 @@ public class Explosion {
         List<ExplodedBlock> explodedBlocks = new ArrayList<>();
         blocks.forEach((block, ignore, add) -> {
             if (block.getType() == Material.TNT) {
-                TNTPrimed tnt = (TNTPrimed) Objects.requireNonNull(block.getLocation().getWorld()).spawnEntity(MathUtils.toCenterLocation(block.getLocation()), EntityType.PRIMED_TNT);
+                TNTPrimed tnt = (TNTPrimed) Objects.requireNonNull(block.getLocation().getWorld()).spawnEntity(MathUtils.toCenterLocation(block.getLocation()), EntityType.TNT);
                 tnt.setFuseTicks(MathUtils.generateRandomInteger(10, 30));
                 tnt.setVelocity(MathUtils.calculateVectorBetween2Locations(MathUtils.toCenterLocation(location.clone()), MathUtils.toCenterLocation(block.getLocation().clone())).normalize().multiply(0.7));
                 return;

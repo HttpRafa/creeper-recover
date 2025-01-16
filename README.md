@@ -34,7 +34,7 @@ Recovers all destroyed blocks by Creeper or other Entities
       "ignore": true,
       "entityTypes": [
         "CREEPER",
-        "PRIMED_TNT"
+        "TNT"
       ]
     },
     {
@@ -68,7 +68,7 @@ all: If "all" is set to true all entities will be affected. So if you want only 
 ### Example Entities
 ```
 CREEPER
-PRIMED_TNT
+TNT
 SMALL_FIREBALL
 FIREBALL
 WITHER_SKULL
@@ -94,7 +94,7 @@ DRAGON_FIREBALL
       "ignore": false,
       "entityTypes": [
         "CREEPER",
-        "PRIMED_TNT"
+        "TNT"
       ]
 }
 ```
