@@ -41,6 +41,7 @@ package de.rafael.plugins.creeper.recover.common.listener;
 import de.rafael.plugins.creeper.recover.common.CreeperPlugin;
 import de.rafael.plugins.creeper.recover.common.classes.Explosion;
 import de.rafael.plugins.creeper.recover.common.classes.list.BlockList;
+import org.bukkit.ExplosionResult;
 import org.bukkit.Material;
 import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
@@ -53,10 +54,8 @@ public class EntityExplodeListener implements Listener {
     public void on(EntityExplodeEvent event) {
         if (!CreeperPlugin.instance().configManager().enabled()) return;
 
-        //if explosion type is BREEZE_WIND_CHARGE or WIND_CHARGE, do nothing
-        if (event.getEntity().getType().toString().equals("BREEZE_WIND_CHARGE") || event.getEntity().getType().toString().equals("WIND_CHARGE")) {
-            return;
-        }
+        // Wind charges and wind-charged mobs only trigger blocks, they don't break them
+        if (event.getExplosionResult() == ExplosionResult.TRIGGER_BLOCK) return;
 
         if (CreeperPlugin.instance().configManager().usePlugin(event)) {
             var blocks = new BlockList(event.blockList());
