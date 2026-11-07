@@ -46,6 +46,7 @@ import org.bukkit.block.Block;
 import org.bukkit.event.EventHandler;
 import org.bukkit.event.Listener;
 import org.bukkit.event.entity.EntityExplodeEvent;
+import org.bukkit.inventory.InventoryHolder;
 
 public class EntityExplodeListener implements Listener {
 
@@ -67,6 +68,10 @@ public class EntityExplodeListener implements Listener {
 
             // Store blocks
             CreeperPlugin.instance().explosionManager().handle(new Explosion(event.getLocation().clone(), blocks));
+
+            // Empty containers so removing them doesn't drop the items that get recovered
+            blocks.stream().map(Block::getState).filter(state -> state instanceof InventoryHolder)
+                    .forEach(state -> ((InventoryHolder) state).getInventory().clear());
 
             // Remove all blocks without collision. To prevent redstone and other blocks from being without support blocks.
             blocks.stream().filter(Block::isPassable).forEach(block -> block.setType(Material.AIR, false));
